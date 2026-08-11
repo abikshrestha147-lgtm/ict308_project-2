@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owner Reports — Warner's Electronics</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar" data-nav></header>
+    <main class="page">
+      <h1>Business reports</h1>
+      <p class="muted">Owner dashboard — recommendation and sales overview (demo data)</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="muted">Orders this week</div>
+          <strong>128</strong>
+        </div>
+        <div class="stat">
+          <div class="muted">Recommendation clicks</div>
+          <strong>642</strong>
+        </div>
+        <div class="stat">
+          <div class="muted">Conversion rate</div>
+          <strong>18%</strong>
+        </div>
+        <div class="stat">
+          <div class="muted">Avg. basket</div>
+          <strong>$214</strong>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Top categories</h2>
+        <div class="bars" style="margin-top: 1rem">
+          <div class="bar-row"><span>Laptops</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span>86%</span></div>
+          <div class="bar-row"><span>Phones</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><span>72%</span></div>
+          <div class="bar-row"><span>Audio</span><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><span>54%</span></div>
+          <div class="bar-row"><span>Accessories</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><span>41%</span></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 1rem">
+        <h2>Rule performance</h2>
+        <table class="table" style="margin-top: 0.5rem">
+          <thead>
+            <tr><th>Rule</th><th>Views</th><th>Adds</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Laptop bag with UltraBook</td><td>210</td><td>46</td></tr>
+            <tr><td>Earbuds with SmartPhone</td><td>188</td><td>51</td></tr>
+            <tr><td>Mouse with headset</td><td>96</td><td>22</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      Warners.requireRole(["owner", "admin"]);
+      Warners.renderNav("reports");
+    </script>
+  </body>
+</html>
