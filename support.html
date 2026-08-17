@@ -1,27 +1,125 @@
 <!DOCTYPE html>
+<!-- Owner: Sukhman — customer support -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support — Warner's Electronics</title>
+    <title>Support — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sukhman.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
-    <main class="page">
-      <section class="panel">
-        <h1 style="margin-top:0">Support</h1>
-        <p class="meta">
-          Need help with recommendations, orders or your account? Contact Warner's
-          Electronics support at support@warners.electronics or visit a store associate.
-        </p>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
+    <main class="page support-page">
+      <section class="support-hero">
+        <div class="support-hero-inner">
+          <h1>Get in touch</h1>
+          <p>
+            Want to get in touch? We'd love to hear from you. Here's how you can reach Warner
+            Electronics support.
+          </p>
+        </div>
+      </section>
+
+      <section class="support-cards">
+        <article class="support-card">
+          <div class="support-card-icon" aria-hidden="true">📞</div>
+          <h2>Talk to sales</h2>
+          <p>
+            Interested in bulk orders, business accounts, or product advice? Our sales team is
+            ready to help you find the right electronics.
+          </p>
+          <a class="support-phone" href="tel:+61290001234">+61 2 9000 1234</a>
+          <button class="support-link-btn" type="button" id="show-hours">
+            View store hours &amp; locations
+          </button>
+        </article>
+
+        <article class="support-card">
+          <div class="support-card-icon" aria-hidden="true">💬</div>
+          <h2>Contact customer support</h2>
+          <p>
+            If you need help with an order, delivery, returns, or your account, our support team
+            is here for you.
+          </p>
+          <button class="btn support-cta" type="button" id="open-support-form">
+            Contact support
+          </button>
+        </article>
+      </section>
+
+      <section class="support-panel" id="support-form-panel" hidden>
+        <h2>Send us a message</h2>
+        <p class="meta">Fill in the form below and we'll get back to you within 1 business day.</p>
+        <form id="support-form" class="support-form">
+          <div class="form-grid">
+            <div class="field">
+              <label for="support-name">Full name</label>
+              <input id="support-name" required />
+            </div>
+            <div class="field">
+              <label for="support-email">Email</label>
+              <input id="support-email" type="email" required />
+            </div>
+            <div class="field field-span-2">
+              <label for="support-order">Order number (optional)</label>
+              <input id="support-order" placeholder="e.g. WE-12345678" />
+            </div>
+            <div class="field field-span-2">
+              <label for="support-message">How can we help?</label>
+              <textarea id="support-message" rows="4" required></textarea>
+            </div>
+          </div>
+          <button class="btn" type="submit">Send message</button>
+        </form>
+      </section>
+
+      <section class="support-panel" id="support-hours-panel" hidden>
+        <h2>Store hours &amp; locations</h2>
+        <div class="support-hours-grid">
+          <div>
+            <strong>Sydney flagship</strong>
+            <p class="meta">Mon–Fri 9:00 am – 6:00 pm<br />Sat 10:00 am – 4:00 pm<br />Sun Closed</p>
+          </div>
+          <div>
+            <strong>Melbourne store</strong>
+            <p class="meta">Mon–Fri 9:30 am – 5:30 pm<br />Sat 10:00 am – 3:00 pm<br />Sun Closed</p>
+          </div>
+          <div>
+            <strong>Online support</strong>
+            <p class="meta">Email: support@warners.electronics<br />Response within 24 hours</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="support-faq">
+        <h2>Frequently asked questions</h2>
+        <details class="faq-item">
+          <summary>How do I track my order?</summary>
+          <p>Log in and open <a href="account.html#tracking">My account → Package tracking</a> to see delivery progress.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What is your returns policy?</summary>
+          <p>Unopened items can be returned within 30 days. Contact support with your order number to start a return.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need an account to shop?</summary>
+          <p>You can browse freely. An account is only required when you proceed to checkout.</p>
+        </details>
       </section>
     </main>
+
+    <button class="support-chat-fab" type="button" id="support-chat" aria-label="Open live chat">
+      💬
+    </button>
+
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["customer", "guest"]);
-      Warners.renderHeader("support");
-    </script>
+    <script src="js/sukhman/support.js"></script>
   </body>
 </html>

@@ -1,26 +1,20 @@
 # Warner's Electronics — ICT308 Project 2
-front end for warner's electronics
+
+Static HTML/CSS/JS frontend. Team file list is in **TEAM.md**.
 
 ## Run in VS Code
-1. Open this folder in VS Code
-2. Click **Go Live** (or right-click `index.html` → **Open with Live Server**)
+1. Open this folder
+2. Click **Go Live** (opens the shop at `home.html`)
 
-## Demo login
+Login is at `login.html`. Checkout asks customers to log in or create an account.
+
+## Staff demo login
 | Username | Password | Role |
 |----------|----------|------|
-| customer | customer | Customer shop |
 | admin | admin | Admin catalogue |
 | owner | owner | Owner reports |
-| Guest |-------|Guest|
 
-## Figma screens covered
-- Login
-- Customer home / browse
-- Product details + recommendations
-- Search results + filters
-- Shopping cart
-- Admin product catalogue
-- Admin categories & recommendation rules
-- Business owner reports
+Customers: browse freely. **Create Account** / **Log in** only when checking out.
 
-Extracted Figma images are in the `figma/` folder for reference.
+## Team
+See [TEAM.md](TEAM.md) for who owns which pages.

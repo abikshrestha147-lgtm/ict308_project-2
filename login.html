@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- Owner: Kushal — login + create account -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log in — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/kushal.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
+    <div class="login-page">
+      <div class="login-shell">
+        <div class="login-form-pane">
+          <div id="login-view">
+            <h1>Log in</h1>
+            <p class="sub">
+              Browse the store freely. Log in or create an account when you are ready to purchase.
+            </p>
+            <form id="login-form">
+              <div class="field">
+                <label for="username">Username / Email</label>
+                <input id="username" name="username" autocomplete="username" required />
+              </div>
+              <div class="field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required />
+              </div>
+              <div class="login-actions">
+                <button class="btn" type="submit">Log in</button>
+                <button class="btn btn-outline" type="button" id="show-signup">Create Account</button>
+              </div>
+              <a class="btn btn-ghost" href="home.html" style="margin-top:0.65rem;width:100%;display:flex">
+                Back to store
+              </a>
+              <p class="demo-note" id="error" style="color:#dc2626;display:none"></p>
+              <p class="demo-note">
+                Staff demo:<br />
+                <strong>admin / admin</strong> · <strong>owner / owner</strong><br />
+                Customers: create an account, then log in to checkout.
+              </p>
+            </form>
+          </div>
+
+          <div id="signup-view" hidden>
+            <h1>Create account</h1>
+            <p class="sub">Needed only when you want to purchase items.</p>
+            <form id="signup-form">
+              <div class="field">
+                <label for="full-name">Full name</label>
+                <input id="full-name" required placeholder="Your name" />
+              </div>
+              <div class="field">
+                <label for="new-username">Username</label>
+                <input id="new-username" required autocomplete="username" placeholder="choose a username" />
+              </div>
+              <div class="field">
+                <label for="new-password">Password</label>
+                <input id="new-password" type="password" required minlength="4" autocomplete="new-password" />
+              </div>
+              <div class="field">
+                <label for="confirm-password">Confirm password</label>
+                <input id="confirm-password" type="password" required minlength="4" autocomplete="new-password" />
+              </div>
+              <div class="login-actions">
+                <button class="btn" type="submit">Create account</button>
+                <button class="btn btn-outline" type="button" id="show-login">Back to Log in</button>
+              </div>
+              <p class="demo-note" id="signup-error" style="color:#dc2626;display:none"></p>
+            </form>
+          </div>
+        </div>
+        <aside class="login-aside">
+          <h2>Access</h2>
+          <ul>
+            <li><span class="dot">1</span> Anyone can browse products, search, and use the cart</li>
+            <li><span class="dot">C</span> Customer login is required only to purchase / checkout</li>
+            <li><span class="dot">A</span> Admin: catalogue and storefront</li>
+            <li><span class="dot">O</span> Owner: reports</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/kushal/login.js"></script>
+  </body>
+</html>

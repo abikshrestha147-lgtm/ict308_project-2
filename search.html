@@ -1,19 +1,22 @@
 <!DOCTYPE html>
+<!-- Owner: Abik — customer search -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Search — Warner's Electronics</title>
+    <title>Search — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/abik.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
     <main class="page">
-      <h2 class="section-title">Search Results</h2>
-      <form class="search-row" id="search-form" style="margin-bottom:1rem">
-        <input id="q" name="q" placeholder="laptop accessories" />
-        <button class="btn" type="submit">Search</button>
-      </form>
+      <h2 class="section-title" id="search-heading">All products</h2>
 
       <div class="search-layout">
         <aside class="filters">
@@ -24,15 +27,20 @@
           </div>
           <div class="filter-group">
             <h4>Price range</h4>
-            <label><input type="checkbox" data-price="under50" /> Under $50</label>
-            <label><input type="checkbox" data-price="50to200" /> $50 - $200</label>
-            <label><input type="checkbox" data-price="200plus" /> $200+</label>
+            <div class="price-range">
+              <label>
+                <span>Min ($)</span>
+                <input type="number" data-price-min min="0" step="1" placeholder="0" />
+              </label>
+              <label>
+                <span>Max ($)</span>
+                <input type="number" data-price-max min="0" step="1" placeholder="Any" />
+              </label>
+            </div>
           </div>
           <div class="filter-group">
             <h4>Brand</h4>
-            <label><input type="checkbox" data-brand="WarnerTech" /> WarnerTech</label>
-            <label><input type="checkbox" data-brand="LogiSound" /> LogiSound</label>
-            <label><input type="checkbox" data-brand="SmartCore" /> SmartCore</label>
+            <div id="brand-filters"></div>
           </div>
         </aside>
         <section>
@@ -43,69 +51,6 @@
     </main>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["customer", "guest"]);
-      Warners.renderHeader("products");
-      Warners.bindAddButtons();
-
-      const params = new URLSearchParams(location.search);
-      document.getElementById("q").value = params.get("q") || "";
-      const preCat = params.get("cat") || "";
-
-      document.getElementById("cat-filters").innerHTML = Warners.getCategories()
-        .map(
-          (c) =>
-            `<label><input type="checkbox" data-cat="${c}" ${
-              preCat === c ? "checked" : ""
-            } /> ${c}</label>`
-        )
-        .join("");
-
-      function render() {
-        const q = document.getElementById("q").value.trim().toLowerCase();
-        const cats = [...document.querySelectorAll("[data-cat]:checked")].map((e) =>
-          e.getAttribute("data-cat")
-        );
-        const brands = [...document.querySelectorAll("[data-brand]:checked")].map((e) =>
-          e.getAttribute("data-brand")
-        );
-        const prices = [...document.querySelectorAll("[data-price]:checked")].map((e) =>
-          e.getAttribute("data-price")
-        );
-
-        let list = Warners.getProducts().filter((p) => {
-          const matchQ =
-            !q ||
-            p.name.toLowerCase().includes(q) ||
-            p.subtitle.toLowerCase().includes(q) ||
-            p.category.toLowerCase().includes(q);
-          const matchC = !cats.length || cats.includes(p.category);
-          const matchB = !brands.length || brands.includes(p.brand);
-          let matchP = !prices.length;
-          if (prices.length) {
-            matchP = prices.some((r) => {
-              if (r === "under50") return p.price < 50;
-              if (r === "50to200") return p.price >= 50 && p.price <= 200;
-              if (r === "200plus") return p.price > 200;
-              return true;
-            });
-          }
-          return matchQ && matchC && matchB && matchP;
-        });
-
-        document.getElementById("count").textContent =
-          `Showing ${list.length} results sorted by relevance.`;
-        document.getElementById("results").innerHTML = list.length
-          ? list.map(Warners.productCard).join("")
-          : `<div class="panel">No products match your filters.</div>`;
-      }
-
-      document.getElementById("search-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        render();
-      });
-      document.querySelector(".filters").addEventListener("change", render);
-      render();
-    </script>
+    <script src="js/abik/search.js"></script>
   </body>
 </html>

@@ -1,19 +1,26 @@
 <!DOCTYPE html>
+<!-- Owner: Vedic — recommendations -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recommendations — Warner's Electronics</title>
+    <title>Recommendations — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/vedic.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
     <main class="page">
       <section class="hero">
         <h1>Recommended for you</h1>
         <p>
-          Suggestions update from products you view, items in your cart, and
-          admin recommendation rules.
+          Suggestions update on their own from products you view, add to cart,
+          and buy.
         </p>
       </section>
 
@@ -26,31 +33,6 @@
     </main>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["customer", "guest"]);
-      Warners.renderHeader("recommendations");
-      Warners.bindAddButtons();
-
-      const cart = Warners.getCart();
-      const viewed = Warners.getViewedIds();
-      const why = [];
-      if (cart.length) why.push("items in your cart");
-      if (viewed.length) why.push("products you viewed");
-      why.push("store recommendation rules");
-      document.getElementById("why").textContent =
-        "Using " + why.join(", ") + ".";
-
-      const recs = Warners.getRecommendations();
-      document.getElementById("recs").innerHTML = recs.length
-        ? recs.map(Warners.productCard).join("")
-        : `<div class="panel">Browse or add something to your cart to unlock smarter recommendations. <a href="home.html">Start shopping</a></div>`;
-
-      document.getElementById("popular").innerHTML = Warners.getProducts()
-        .slice()
-        .sort((a, b) => (b.weight || 0) - (a.weight || 0))
-        .slice(0, 4)
-        .map(Warners.productCard)
-        .join("");
-    </script>
+    <script src="js/vedic/recommendations.js"></script>
   </body>
 </html>

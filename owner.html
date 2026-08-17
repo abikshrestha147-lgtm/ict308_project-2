@@ -1,152 +1,40 @@
 <!DOCTYPE html>
+<!-- Owner: Kushal — owner dashboard -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Owner Reports — Warner's Electronics</title>
+    <title>Owner Reports — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/kushal.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
     <div class="app-shell">
       <aside class="sidebar">
         <h2>Owner Panel</h2>
+        <a class="side-link" href="home.html">Storefront</a>
         <button class="side-link active" type="button" data-tab="reports">Reports</button>
-        <button class="side-link" type="button" data-tab="rules">Rules</button>
         <button class="side-link" type="button" data-tab="performance">Performance</button>
       </aside>
       <main class="admin-main">
         <section id="view-reports">
-          <h2 style="margin-top:0">Business owner reports</h2>
-          <p class="meta">Sales and recommendation overview (demo data you can refresh)</p>
-          <div class="stat-grid" style="margin-top:1rem">
-            <div class="stat"><span>Total sales</span><strong id="o-sales">$48,920</strong></div>
-            <div class="stat"><span>Orders this week</span><strong id="o-orders">128</strong></div>
-            <div class="stat"><span>Recommendation clicks</span><strong id="o-clicks">642</strong></div>
-            <div class="stat"><span>Conversion rate</span><strong id="o-conv">18%</strong></div>
-          </div>
-          <button class="btn" type="button" id="o-refresh" style="margin-bottom:1rem">Refresh reports</button>
-          <div class="two-col">
-            <section class="panel">
-              <h3 style="margin-top:0">Top categories</h3>
-              <div class="bars" style="margin-top:1rem">
-                <div class="bar-row"><span>Laptops</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span>86%</span></div>
-                <div class="bar-row"><span>Phones</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><span>72%</span></div>
-                <div class="bar-row"><span>Audio</span><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><span>54%</span></div>
-                <div class="bar-row"><span>Accessories</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><span>41%</span></div>
-              </div>
-            </section>
-            <section class="panel">
-              <h3 style="margin-top:0">Rule performance</h3>
-              <table class="table" style="margin-top:0.5rem">
-                <thead><tr><th>Rule</th><th>Views</th><th>Adds</th></tr></thead>
-                <tbody>
-                  <tr><td>Laptop bag with UltraBook</td><td>210</td><td>46</td></tr>
-                  <tr><td>Earbuds with SmartPhone</td><td>188</td><td>51</td></tr>
-                  <tr><td>Mouse with headset</td><td>96</td><td>22</td></tr>
-                </tbody>
-              </table>
-            </section>
-          </div>
+          <div id="owner-reports"></div>
         </section>
 
-        <section class="panel" id="view-rules" hidden>
-          <h2 style="margin-top:0">Recommendation rules</h2>
-          <p class="meta">Owner view — review and update rules that drive customer suggestions.</p>
-          <div class="field"><label>Rule name</label><input id="rule-name" /></div>
-          <div class="field"><label>When</label><input id="rule-when" /></div>
-          <div class="field"><label>Then recommend</label><input id="rule-then" /></div>
-          <button class="btn" type="button" id="save-rule">Save rule</button>
-          <table class="table" id="rules-table" style="margin-top:1rem"></table>
-        </section>
-
-        <section class="panel" id="view-performance" hidden>
-          <h2 style="margin-top:0">Performance</h2>
-          <p class="meta">Recommendation conversion by category.</p>
-          <div class="bars" style="margin-top:1rem">
-            <div class="bar-row"><span>Laptops</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span>86%</span></div>
-            <div class="bar-row"><span>Phones</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><span>72%</span></div>
-            <div class="bar-row"><span>Audio</span><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><span>54%</span></div>
-            <div class="bar-row"><span>Accessories</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><span>41%</span></div>
-          </div>
+        <section id="view-performance" hidden>
+          <div id="owner-performance"></div>
         </section>
       </main>
     </div>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["owner"]);
-      Warners.renderHeader("reports");
-
-      function renderRules() {
-        document.getElementById("rules-table").innerHTML = `
-          <thead><tr><th>Rule</th><th>When</th><th>Then</th><th></th></tr></thead>
-          <tbody>
-            ${Warners.getRules()
-              .map(
-                (r, i) => `
-              <tr>
-                <td>${r.name}</td><td>${r.when}</td><td>${r.then}</td>
-                <td><button class="btn btn-danger btn-sm" type="button" data-del-rule="${i}">Del</button></td>
-              </tr>`
-              )
-              .join("")}
-          </tbody>`;
-      }
-
-      function showTab(name) {
-        ["reports", "rules", "performance"].forEach((t) => {
-          document.getElementById(`view-${t}`).hidden = t !== name;
-        });
-        document.querySelectorAll(".side-link").forEach((btn) => {
-          btn.classList.toggle("active", btn.getAttribute("data-tab") === name);
-        });
-        Warners.renderHeader(name);
-      }
-
-      document.querySelectorAll(".side-link").forEach((btn) => {
-        btn.addEventListener("click", () => showTab(btn.getAttribute("data-tab")));
-      });
-
-      document.getElementById("save-rule").onclick = () => {
-        const name = document.getElementById("rule-name").value.trim();
-        if (!name) return Warners.toast("Rule name required");
-        Warners.addRule({
-          name,
-          when: document.getElementById("rule-when").value.trim(),
-          then: document.getElementById("rule-then").value.trim(),
-        });
-        document.getElementById("rule-name").value = "";
-        document.getElementById("rule-when").value = "";
-        document.getElementById("rule-then").value = "";
-        renderRules();
-      };
-
-      document.getElementById("rules-table").addEventListener("click", (e) => {
-        const i = e.target.getAttribute("data-del-rule");
-        if (i !== null && confirm("Delete this rule?")) {
-          Warners.deleteRule(Number(i));
-          renderRules();
-        }
-      });
-
-      document.getElementById("o-refresh").onclick = () => {
-        document.getElementById("o-sales").textContent =
-          "$" + (40000 + Math.floor(Math.random() * 20000)).toLocaleString();
-        document.getElementById("o-orders").textContent = String(
-          90 + Math.floor(Math.random() * 80)
-        );
-        document.getElementById("o-clicks").textContent = String(
-          400 + Math.floor(Math.random() * 400)
-        );
-        document.getElementById("o-conv").textContent =
-          10 + Math.floor(Math.random() * 20) + "%";
-        Warners.toast("Owner reports refreshed");
-      };
-
-      renderRules();
-      const hash = location.hash.replace("#", "");
-      if (["reports", "rules", "performance"].includes(hash)) showTab(hash);
-    </script>
+    <script src="js/kushal/reports.js"></script>
+    <script src="js/kushal/owner.js"></script>
   </body>
 </html>

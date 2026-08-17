@@ -179,12 +179,6 @@ window.WARNERS_CATEGORIES = [
   "Tablets",
 ];
 
-window.WARNERS_RULES = [
-  { name: "Laptop bag with UltraBook", when: "View UltraBook Pro 14", then: "Recommend laptop sleeve" },
-  { name: "Earbuds with SmartPhone", when: "Add SmartPhone X2", then: "Recommend headset" },
-  { name: "Mouse with headset", when: "Buy Noise-Free Headset", then: "Suggest Wireless Mouse" },
-];
-
 window.WARNERS_USERS = {
   admin: { password: "admin", role: "admin", label: "Admin", initial: "A" },
   owner: { password: "owner", role: "owner", label: "Owner", initial: "O" },

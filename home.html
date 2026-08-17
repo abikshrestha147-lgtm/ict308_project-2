@@ -1,54 +1,40 @@
 <!DOCTYPE html>
+<!-- Owner: Abik — customer home -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home — Warner's Electronics</title>
+    <title>Home — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/abik.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
     <main class="page">
       <section class="hero">
+        <p class="hero-kicker">Warner Electronics</p>
         <h1>Find electronics faster with smart recommendations</h1>
         <p>
           Browse laptops, smartphones, audio accessories and smart home products.
-          Recommendations update based on your product views.
+          Recommendations update on their own when you view or buy products.
         </p>
-        <form class="search-row" action="search.html" method="get">
-          <input name="q" placeholder="Search laptops, phones, accessories..." />
-          <button class="btn" type="submit">Search</button>
-        </form>
       </section>
 
-      <div class="pills" id="cats"></div>
-
-      <h2 class="section-title" id="recommended">Featured Products</h2>
-      <div class="grid" id="featured"></div>
-
-      <h2 class="section-title" style="margin-top:1.5rem">Recommended for you</h2>
-      <div class="grid" id="home-recs"></div>
+      <div id="home-browse">
+        <div class="pills" id="cats"></div>
+        <h2 class="section-title" id="recommended">Featured Products</h2>
+        <div class="grid" id="featured"></div>
+        <h2 class="section-title" style="margin-top:1.5rem">Recommended for you</h2>
+        <div class="grid" id="home-recs"></div>
+      </div>
     </main>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["customer", "guest"]);
-      Warners.renderHeader("products");
-      Warners.bindAddButtons();
-
-      document.getElementById("cats").innerHTML = Warners.getCategories()
-        .map((c) => `<a class="pill" href="search.html?cat=${encodeURIComponent(c)}">${c}</a>`)
-        .join("");
-
-      document.getElementById("featured").innerHTML = Warners.getProducts()
-        .slice(0, 4)
-        .map(Warners.productCard)
-        .join("");
-
-      document.getElementById("home-recs").innerHTML = Warners.getRecommendations()
-        .slice(0, 4)
-        .map(Warners.productCard)
-        .join("");
-    </script>
+    <script src="js/abik/home.js"></script>
   </body>
 </html>

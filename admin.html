@@ -1,19 +1,26 @@
 <!DOCTYPE html>
+<!-- Owner: Kushal — admin dashboard -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin — Warner's Electronics</title>
+    <title>Admin — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/kushal.css" />
   </head>
   <body>
-    <header class="site-header" data-header></header>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
     <div class="app-shell">
       <aside class="sidebar">
         <h2>Admin Panel</h2>
+        <a class="side-link" href="home.html">Storefront</a>
         <button class="side-link active" type="button" data-tab="products">Products</button>
         <button class="side-link" type="button" data-tab="categories">Categories</button>
-        <button class="side-link" type="button" data-tab="rules">Recommendation Rules</button>
         <button class="side-link" type="button" data-tab="reports">Reports</button>
         <button class="side-link" type="button" data-tab="settings">Settings</button>
       </aside>
@@ -50,55 +57,60 @@
           <div class="pills" id="cat-list" style="margin-top:1rem"></div>
         </section>
 
-        <section class="panel" id="view-rules" hidden>
-          <div class="panel-head">
-            <div>
-              <h2 style="margin:0" id="rules">Recommendation Rules</h2>
-              <p>These rules power customer recommendations when they buy or view products.</p>
-            </div>
-            <button class="btn" type="button" id="add-rule">Add Rule</button>
-          </div>
-          <div class="panel" style="background:#f8fafc;margin-bottom:1rem" id="rule-form-wrap">
-            <div class="field"><label>Rule name</label><input id="rule-name" placeholder="Laptop bag with UltraBook" /></div>
-            <div class="field"><label>When</label><input id="rule-when" placeholder="View UltraBook Pro 14" /></div>
-            <div class="field"><label>Then recommend</label><input id="rule-then" placeholder="Recommend laptop sleeve" /></div>
-            <button class="btn" type="button" id="save-rule">Save rule</button>
-          </div>
-          <table class="table" id="rules-table"></table>
-        </section>
-
-        <section class="panel" id="view-reports" hidden>
-          <h2 style="margin-top:0">Reports</h2>
-          <p class="meta">Admin performance snapshot.</p>
-          <div class="stat-grid" style="margin-top:1rem">
-            <div class="stat"><span>Orders this week</span><strong id="stat-orders">128</strong></div>
-            <div class="stat"><span>Recommendation clicks</span><strong id="stat-clicks">642</strong></div>
-            <div class="stat"><span>Conversion</span><strong id="stat-conv">18%</strong></div>
-          </div>
-          <button class="btn" type="button" id="refresh-stats">Refresh stats</button>
+        <section id="view-reports" hidden>
+          <div id="admin-reports"></div>
         </section>
 
         <section class="panel" id="view-settings" hidden>
           <h2 style="margin-top:0">Settings</h2>
-          <p class="meta">Reset demo catalogue / rules stored in this browser.</p>
-          <button class="btn btn-outline" type="button" id="reset-data">Reset demo data</button>
+          <p class="meta">Reset demo catalogue stored in this browser. Sales history is kept unless you clear it.</p>
+          <button class="btn btn-outline" type="button" id="reset-data">Reset demo catalogue</button>
+          <button class="btn btn-danger" type="button" id="clear-orders" style="margin-left:0.5rem">Clear sales history</button>
         </section>
       </main>
     </div>
 
     <div class="modal-backdrop" id="product-modal" role="dialog" aria-modal="true">
-      <div class="modal">
-        <h3 id="modal-title">Edit product</h3>
-        <input type="hidden" id="edit-id" />
-        <div class="field"><label>Name</label><input id="edit-name" /></div>
-        <div class="field"><label>Category</label><select id="edit-category"></select></div>
-        <div class="field"><label>Brand</label><input id="edit-brand" /></div>
-        <div class="field"><label>Price</label><input id="edit-price" type="number" min="0" step="1" /></div>
-        <div class="field"><label>Stock</label><input id="edit-stock" type="number" min="0" step="1" /></div>
-        <div class="field"><label>Recommendation weight</label><input id="edit-weight" type="number" min="0" max="1" step="0.01" /></div>
-        <div class="field"><label>Subtitle</label><input id="edit-subtitle" /></div>
-        <div class="field"><label>Description</label><input id="edit-description" /></div>
-        <div class="actions">
+      <div class="modal modal-product">
+        <div class="modal-head">
+          <h3 id="modal-title">Edit product</h3>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-id" />
+          <div class="field"><label>Name</label><input id="edit-name" /></div>
+          <div class="field"><label>Category</label><select id="edit-category"></select></div>
+          <div class="field"><label>Brand</label><input id="edit-brand" placeholder="e.g. Acer" /></div>
+          <div class="field">
+            <label>Cover photo</label>
+            <p class="field-hint">Shown on product cards in the store.</p>
+            <input id="edit-image-file" type="file" accept="image/*" />
+            <input type="hidden" id="edit-image" />
+            <div class="photo-preview" id="photo-preview">No cover photo</div>
+            <button class="btn btn-outline btn-sm photo-remove" type="button" id="remove-cover" hidden>
+              Remove cover photo
+            </button>
+          </div>
+          <div class="field">
+            <label>Detail gallery</label>
+            <p class="field-hint">Extra photos customers see on the product page (up to 12).</p>
+            <input id="edit-gallery-files" type="file" accept="image/*" multiple />
+            <div class="gallery-preview" id="gallery-preview">No gallery photos yet</div>
+          </div>
+          <div class="modal-row">
+            <div class="field"><label>Price</label><input id="edit-price" type="number" min="0" step="1" /></div>
+            <div class="field"><label>Stock</label><input id="edit-stock" type="number" min="0" step="1" /></div>
+          </div>
+          <div class="field"><label>Recommendation weight</label><input id="edit-weight" type="number" min="0" max="1" step="0.01" /></div>
+          <div class="field"><label>Subtitle</label><input id="edit-subtitle" /></div>
+          <div class="field"><label>Description</label><textarea id="edit-description" rows="2"></textarea></div>
+          <div class="field">
+            <label>Key specifications</label>
+            <p class="field-hint">Each bullet appears on the product detail page.</p>
+            <div id="specs-list" class="specs-editor"></div>
+            <button class="btn btn-outline btn-sm" type="button" id="add-spec">+ Add bullet</button>
+          </div>
+        </div>
+        <div class="modal-foot actions">
           <button class="btn btn-ghost" type="button" id="modal-cancel">Cancel</button>
           <button class="btn" type="button" id="modal-save">Save changes</button>
         </div>
@@ -107,246 +119,7 @@
 
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      Warners.requireRole(["admin"]);
-      Warners.renderHeader("products");
-
-      const modal = document.getElementById("product-modal");
-
-      function fillCatFilter() {
-        const catSelect = document.getElementById("admin-cat");
-        const editCat = document.getElementById("edit-category");
-        const current = catSelect.value;
-        catSelect.innerHTML = `<option value="">Filter Category</option>`;
-        editCat.innerHTML = "";
-        Warners.getCategories().forEach((c) => {
-          catSelect.appendChild(new Option(c, c));
-          editCat.appendChild(new Option(c, c));
-        });
-        catSelect.value = current;
-      }
-
-      function openProductModal(product) {
-        document.getElementById("modal-title").textContent = product
-          ? "Edit product"
-          : "Add product";
-        document.getElementById("edit-id").value = product?.id || "";
-        document.getElementById("edit-name").value = product?.name || "";
-        document.getElementById("edit-category").value =
-          product?.category || Warners.getCategories()[0] || "Accessories";
-        document.getElementById("edit-brand").value = product?.brand || "WarnerTech";
-        document.getElementById("edit-price").value = product?.price ?? 99;
-        document.getElementById("edit-stock").value = product?.stock ?? 20;
-        document.getElementById("edit-weight").value = product?.weight ?? 0.8;
-        document.getElementById("edit-subtitle").value = product?.subtitle || "";
-        document.getElementById("edit-description").value = product?.description || "";
-        modal.classList.add("open");
-      }
-
-      function closeModal() {
-        modal.classList.remove("open");
-      }
-
-      function renderTable() {
-        const q = document.getElementById("admin-q").value.trim().toLowerCase();
-        const cat = document.getElementById("admin-cat").value;
-        const list = Warners.getProducts().filter((p) => {
-          const matchQ =
-            !q ||
-            p.name.toLowerCase().includes(q) ||
-            (p.brand || "").toLowerCase().includes(q) ||
-            p.category.toLowerCase().includes(q);
-          return matchQ && (!cat || p.category === cat);
-        });
-        document.getElementById("catalogue").innerHTML = `
-          <thead>
-            <tr>
-              <th>Product</th><th>Category</th><th>Price</th><th>Stock</th>
-              <th>Weight</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${list
-              .map(
-                (p) => `
-              <tr>
-                <td><div class="prod-cell"><span class="prod-ico">${p.emoji || "📦"}</span>${p.name}</div></td>
-                <td>${p.category}</td>
-                <td>${Warners.money(p.price)}</td>
-                <td>${p.stock}</td>
-                <td>${p.weight}</td>
-                <td>
-                  <button class="btn btn-outline btn-sm" type="button" data-edit="${p.id}">Edit</button>
-                  <button class="btn btn-danger btn-sm" type="button" data-del="${p.id}">Del</button>
-                </td>
-              </tr>`
-              )
-              .join("")}
-          </tbody>`;
-      }
-
-      function renderCategories() {
-        document.getElementById("cat-list").innerHTML = Warners.getCategories()
-          .map(
-            (c) =>
-              `<button class="pill active" type="button" data-del-cat="${c}" title="Click to remove">${c} ×</button>`
-          )
-          .join("");
-      }
-
-      function renderRules() {
-        document.getElementById("rules-table").innerHTML = `
-          <thead><tr><th>Rule</th><th>When</th><th>Then</th><th></th></tr></thead>
-          <tbody>
-            ${Warners.getRules()
-              .map(
-                (r, i) => `
-              <tr>
-                <td>${r.name}</td>
-                <td>${r.when}</td>
-                <td>${r.then}</td>
-                <td><button class="btn btn-danger btn-sm" type="button" data-del-rule="${i}">Del</button></td>
-              </tr>`
-              )
-              .join("")}
-          </tbody>`;
-      }
-
-      function showTab(name) {
-        ["products", "categories", "rules", "reports", "settings"].forEach((t) => {
-          document.getElementById(`view-${t}`).hidden = t !== name;
-        });
-        document.querySelectorAll(".side-link").forEach((btn) => {
-          btn.classList.toggle("active", btn.getAttribute("data-tab") === name);
-        });
-        Warners.renderHeader(
-          name === "rules" ? "rules" : name === "reports" ? "reports" : "products"
-        );
-      }
-
-      document.querySelectorAll(".side-link").forEach((btn) => {
-        btn.addEventListener("click", () => showTab(btn.getAttribute("data-tab")));
-      });
-      document.getElementById("admin-q").addEventListener("input", renderTable);
-      document.getElementById("admin-cat").addEventListener("change", renderTable);
-
-      document.getElementById("add-product").onclick = () => openProductModal(null);
-      document.getElementById("modal-cancel").onclick = closeModal;
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      document.getElementById("modal-save").onclick = () => {
-        const id = document.getElementById("edit-id").value;
-        const data = {
-          name: document.getElementById("edit-name").value.trim(),
-          category: document.getElementById("edit-category").value,
-          brand: document.getElementById("edit-brand").value.trim(),
-          price: Number(document.getElementById("edit-price").value),
-          stock: Number(document.getElementById("edit-stock").value),
-          weight: Number(document.getElementById("edit-weight").value),
-          subtitle: document.getElementById("edit-subtitle").value.trim(),
-          description: document.getElementById("edit-description").value.trim(),
-        };
-        if (!data.name) {
-          Warners.toast("Name is required");
-          return;
-        }
-        if (id) Warners.updateProduct(id, data);
-        else Warners.addProduct(data);
-        closeModal();
-        fillCatFilter();
-        renderTable();
-      };
-
-      document.getElementById("catalogue").addEventListener("click", (e) => {
-        const editId = e.target.getAttribute("data-edit");
-        const delId = e.target.getAttribute("data-del");
-        if (editId) openProductModal(Warners.productById(editId));
-        if (delId && confirm("Delete this product?")) {
-          Warners.deleteProduct(delId);
-          renderTable();
-        }
-      });
-
-      function addCategoryFromInput() {
-        const name = document.getElementById("cat-input").value.trim();
-        if (!name) return;
-        Warners.addCategory(name);
-        document.getElementById("cat-input").value = "";
-        renderCategories();
-        fillCatFilter();
-      }
-      document.getElementById("add-cat").onclick = addCategoryFromInput;
-      document.getElementById("add-cat-inline").onclick = addCategoryFromInput;
-
-      document.getElementById("cat-list").addEventListener("click", (e) => {
-        const name = e.target.getAttribute("data-del-cat");
-        if (name && confirm(`Remove category "${name}"?`)) {
-          Warners.deleteCategory(name);
-          renderCategories();
-          fillCatFilter();
-          renderTable();
-        }
-      });
-
-      document.getElementById("add-rule").onclick = () => {
-        showTab("rules");
-        document.getElementById("rule-name").focus();
-      };
-      document.getElementById("save-rule").onclick = () => {
-        const name = document.getElementById("rule-name").value.trim();
-        const when = document.getElementById("rule-when").value.trim();
-        const then = document.getElementById("rule-then").value.trim();
-        if (!name) {
-          Warners.toast("Rule name required");
-          return;
-        }
-        Warners.addRule({ name, when, then });
-        document.getElementById("rule-name").value = "";
-        document.getElementById("rule-when").value = "";
-        document.getElementById("rule-then").value = "";
-        renderRules();
-      };
-      document.getElementById("rules-table").addEventListener("click", (e) => {
-        const i = e.target.getAttribute("data-del-rule");
-        if (i !== null && confirm("Delete this rule?")) {
-          Warners.deleteRule(Number(i));
-          renderRules();
-        }
-      });
-
-      document.getElementById("refresh-stats").onclick = () => {
-        document.getElementById("stat-orders").textContent = String(
-          100 + Math.floor(Math.random() * 80)
-        );
-        document.getElementById("stat-clicks").textContent = String(
-          500 + Math.floor(Math.random() * 300)
-        );
-        document.getElementById("stat-conv").textContent =
-          12 + Math.floor(Math.random() * 15) + "%";
-        Warners.toast("Stats refreshed");
-      };
-
-      document.getElementById("reset-data").onclick = () => {
-        localStorage.removeItem("warners_products");
-        localStorage.removeItem("warners_categories");
-        localStorage.removeItem("warners_rules");
-        Warners.toast("Demo data reset");
-        fillCatFilter();
-        renderTable();
-        renderCategories();
-        renderRules();
-      };
-
-      fillCatFilter();
-      renderTable();
-      renderCategories();
-      renderRules();
-      const hash = location.hash.replace("#", "");
-      if (["products", "categories", "rules", "reports", "settings"].includes(hash)) {
-        showTab(hash);
-      }
-    </script>
+    <script src="js/kushal/reports.js"></script>
+    <script src="js/kushal/admin.js"></script>
   </body>
 </html>

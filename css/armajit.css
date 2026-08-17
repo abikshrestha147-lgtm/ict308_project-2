@@ -1,0 +1,41 @@
+/* Armajit — product details page */
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.gallery-main {
+  height: 360px;
+  width: 100%;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+}
+.gallery-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  min-height: 64px;
+}
+.gallery-thumb-btn {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f1f5f9;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-thumb-btn.active,
+.gallery-thumb-btn:hover {
+  border-color: var(--orange);
+}

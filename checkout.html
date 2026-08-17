@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- Owner: Sukhman — checkout -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sukhman.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
+    <main class="page checkout-page">
+      <nav class="checkout-crumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <span aria-hidden="true">&gt;</span>
+        <a href="cart.html">Cart</a>
+        <span aria-hidden="true">&gt;</span>
+        <span aria-current="page">Checkout</span>
+      </nav>
+      <h1 class="checkout-title">Checkout</h1>
+      <div class="checkout-layout">
+        <div class="checkout-main" id="checkout-main"></div>
+        <aside class="checkout-summary" id="checkout-summary"></aside>
+      </div>
+    </main>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sukhman/checkout.js"></script>
+  </body>
+</html>

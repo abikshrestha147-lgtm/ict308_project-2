@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- Owner: Sukhman — customer account panel -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My account — Warner Electronics</title>
+    <link rel="icon" href="images/warner-logo.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/sukhman.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="home.html">
+        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+      </a>
+    </header>
+    <div class="app-shell">
+      <aside class="sidebar customer-sidebar">
+        <h2>My account</h2>
+        <button class="side-link" type="button" data-tab="profile">My profile</button>
+        <button class="side-link active" type="button" data-tab="orders">Past orders</button>
+        <button class="side-link" type="button" data-tab="tracking">Package tracking</button>
+        <a class="side-link" href="home.html">Continue shopping</a>
+      </aside>
+      <main class="admin-main">
+        <section class="panel" id="view-orders">
+          <div class="panel-head">
+            <div>
+              <h2 style="margin:0">Past orders</h2>
+              <p class="meta">Every checkout you complete appears here.</p>
+            </div>
+          </div>
+          <div id="orders-list"></div>
+        </section>
+
+        <section class="panel" id="view-tracking" hidden>
+          <div class="panel-head">
+            <div>
+              <h2 style="margin:0">Package tracking</h2>
+              <p class="meta">Follow delivery progress for your orders.</p>
+            </div>
+          </div>
+          <div id="tracking-list"></div>
+        </section>
+
+        <section class="panel" id="view-profile" hidden>
+          <div class="panel-head">
+            <div>
+              <h2 style="margin:0">My profile</h2>
+              <p class="meta">Update your contact details for delivery.</p>
+            </div>
+          </div>
+          <form id="profile-form" class="profile-form">
+            <div class="form-grid">
+              <div class="field">
+                <label for="profile-first">First name</label>
+                <input id="profile-first" required />
+              </div>
+              <div class="field">
+                <label for="profile-last">Last name</label>
+                <input id="profile-last" required />
+              </div>
+              <div class="field field-span-2">
+                <label for="profile-email">Email</label>
+                <input id="profile-email" type="email" required />
+              </div>
+              <div class="field field-span-2">
+                <label for="profile-phone">Phone number</label>
+                <input id="profile-phone" type="tel" placeholder="e.g. 0412 345 678" />
+              </div>
+              <div class="field field-span-2">
+                <label for="profile-address">Street address</label>
+                <input id="profile-address" placeholder="Street and number" />
+              </div>
+              <div class="field">
+                <label for="profile-city">City</label>
+                <input id="profile-city" />
+              </div>
+              <div class="field">
+                <label for="profile-zip">Zip / postal code</label>
+                <input id="profile-zip" />
+              </div>
+              <div class="field field-span-2">
+                <label for="profile-country">Country</label>
+                <input id="profile-country" placeholder="e.g. Australia" />
+              </div>
+            </div>
+            <button class="btn" type="submit">Save profile</button>
+            <p class="meta" id="profile-msg" style="margin-top:0.75rem"></p>
+          </form>
+        </section>
+      </main>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sukhman/account.js"></script>
+  </body>
+</html>
