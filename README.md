@@ -11,7 +11,7 @@ front end for warner's electronics
 | customer | customer | Customer shop |
 | admin | admin | Admin catalogue |
 | owner | owner | Owner reports |
-or continue as guest
+| Guest |-------|Guest|
 
 ## Figma screens covered
 - Login
