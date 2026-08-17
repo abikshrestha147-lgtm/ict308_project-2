@@ -7,54 +7,104 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <header class="topbar" data-nav></header>
+    <header class="site-header" data-header></header>
     <main class="page">
-      <h1>Search & filters</h1>
-      <p class="muted">Find products by name or category</p>
-      <div class="toolbar">
-        <input id="q" type="search" placeholder="Search products..." />
-        <select id="cat">
-          <option value="">All categories</option>
-        </select>
+      <h2 class="section-title">Search Results</h2>
+      <form class="search-row" id="search-form" style="margin-bottom:1rem">
+        <input id="q" name="q" placeholder="laptop accessories" />
+        <button class="btn" type="submit">Search</button>
+      </form>
+
+      <div class="search-layout">
+        <aside class="filters">
+          <h3>Filters</h3>
+          <div class="filter-group">
+            <h4>Category</h4>
+            <div id="cat-filters"></div>
+          </div>
+          <div class="filter-group">
+            <h4>Price range</h4>
+            <label><input type="checkbox" data-price="under50" /> Under $50</label>
+            <label><input type="checkbox" data-price="50to200" /> $50 - $200</label>
+            <label><input type="checkbox" data-price="200plus" /> $200+</label>
+          </div>
+          <div class="filter-group">
+            <h4>Brand</h4>
+            <label><input type="checkbox" data-brand="WarnerTech" /> WarnerTech</label>
+            <label><input type="checkbox" data-brand="LogiSound" /> LogiSound</label>
+            <label><input type="checkbox" data-brand="SmartCore" /> SmartCore</label>
+          </div>
+        </aside>
+        <section>
+          <p class="meta" id="count" style="margin:0 0 0.85rem"></p>
+          <div class="grid" id="results"></div>
+        </section>
       </div>
-      <div class="grid" id="results"></div>
     </main>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
     <script>
-      Warners.requireRole(["customer"]);
-      Warners.renderNav("search");
-      const cat = document.getElementById("cat");
-      WARNERS_CATEGORIES.forEach((c) => {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        cat.appendChild(opt);
-      });
+      Warners.requireRole(["customer", "guest"]);
+      Warners.renderHeader("products");
+      Warners.bindAddButtons();
+
+      const params = new URLSearchParams(location.search);
+      document.getElementById("q").value = params.get("q") || "";
+      const preCat = params.get("cat") || "";
+
+      document.getElementById("cat-filters").innerHTML = Warners.getCategories()
+        .map(
+          (c) =>
+            `<label><input type="checkbox" data-cat="${c}" ${
+              preCat === c ? "checked" : ""
+            } /> ${c}</label>`
+        )
+        .join("");
 
       function render() {
         const q = document.getElementById("q").value.trim().toLowerCase();
-        const category = cat.value;
-        const list = WARNERS_PRODUCTS.filter((p) => {
+        const cats = [...document.querySelectorAll("[data-cat]:checked")].map((e) =>
+          e.getAttribute("data-cat")
+        );
+        const brands = [...document.querySelectorAll("[data-brand]:checked")].map((e) =>
+          e.getAttribute("data-brand")
+        );
+        const prices = [...document.querySelectorAll("[data-price]:checked")].map((e) =>
+          e.getAttribute("data-price")
+        );
+
+        let list = Warners.getProducts().filter((p) => {
           const matchQ =
             !q ||
             p.name.toLowerCase().includes(q) ||
-            p.subtitle.toLowerCase().includes(q);
-          const matchC = !category || p.category === category;
-          return matchQ && matchC;
+            p.subtitle.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q);
+          const matchC = !cats.length || cats.includes(p.category);
+          const matchB = !brands.length || brands.includes(p.brand);
+          let matchP = !prices.length;
+          if (prices.length) {
+            matchP = prices.some((r) => {
+              if (r === "under50") return p.price < 50;
+              if (r === "50to200") return p.price >= 50 && p.price <= 200;
+              if (r === "200plus") return p.price > 200;
+              return true;
+            });
+          }
+          return matchQ && matchC && matchB && matchP;
         });
-        const results = document.getElementById("results");
-        results.innerHTML = list.length
+
+        document.getElementById("count").textContent =
+          `Showing ${list.length} results sorted by relevance.`;
+        document.getElementById("results").innerHTML = list.length
           ? list.map(Warners.productCard).join("")
-          : `<div class="empty panel">No products match your search.</div>`;
+          : `<div class="panel">No products match your filters.</div>`;
       }
 
-      document.getElementById("q").addEventListener("input", render);
-      cat.addEventListener("change", render);
-      document.getElementById("results").addEventListener("click", (e) => {
-        const id = e.target.getAttribute("data-add");
-        if (id) Warners.addToCart(id);
+      document.getElementById("search-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        render();
       });
+      document.querySelector(".filters").addEventListener("change", render);
       render();
     </script>
   </body>

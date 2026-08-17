@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recommendations — Warner's Electronics</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header></header>
+    <main class="page">
+      <section class="hero">
+        <h1>Recommended for you</h1>
+        <p>
+          Suggestions update from products you view, items in your cart, and
+          admin recommendation rules.
+        </p>
+      </section>
+
+      <h2 class="section-title">Based on your activity</h2>
+      <p class="meta" id="why" style="margin-top:-0.35rem;margin-bottom:1rem"></p>
+      <div class="grid" id="recs"></div>
+
+      <h2 class="section-title" style="margin-top:1.75rem">Popular right now</h2>
+      <div class="grid" id="popular"></div>
+    </main>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      Warners.requireRole(["customer", "guest"]);
+      Warners.renderHeader("recommendations");
+      Warners.bindAddButtons();
+
+      const cart = Warners.getCart();
+      const viewed = Warners.getViewedIds();
+      const why = [];
+      if (cart.length) why.push("items in your cart");
+      if (viewed.length) why.push("products you viewed");
+      why.push("store recommendation rules");
+      document.getElementById("why").textContent =
+        "Using " + why.join(", ") + ".";
+
+      const recs = Warners.getRecommendations();
+      document.getElementById("recs").innerHTML = recs.length
+        ? recs.map(Warners.productCard).join("")
+        : `<div class="panel">Browse or add something to your cart to unlock smarter recommendations. <a href="home.html">Start shopping</a></div>`;
+
+      document.getElementById("popular").innerHTML = Warners.getProducts()
+        .slice()
+        .sort((a, b) => (b.weight || 0) - (a.weight || 0))
+        .slice(0, 4)
+        .map(Warners.productCard)
+        .join("");
+    </script>
+  </body>
+</html>
