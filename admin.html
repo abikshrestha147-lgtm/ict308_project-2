@@ -9,63 +9,161 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/kushal.css" />
   </head>
-  <body>
-    <header class="site-header" data-header>
-      <a class="brand" href="home.html">
-        <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+  <body class="admin-app">
+    <aside class="admin-rail">
+      <a class="admin-brand" href="home.html">
+        <img src="images/warner-mark.png" alt="" />
+        <span>
+          <strong>WARNER</strong>
+          <em>ELECTRONICS</em>
+        </span>
       </a>
-    </header>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <h2>Admin Panel</h2>
-        <a class="side-link" href="home.html">Storefront</a>
-        <button class="side-link active" type="button" data-tab="products">Products</button>
-        <button class="side-link" type="button" data-tab="categories">Categories</button>
-        <button class="side-link" type="button" data-tab="reports">Reports</button>
-        <button class="side-link" type="button" data-tab="settings">Settings</button>
-      </aside>
-      <main class="admin-main">
-        <section class="panel" id="view-products">
-          <div class="panel-head">
+      <div class="admin-team">Catalogue workspace</div>
+      <nav class="admin-nav" aria-label="Admin">
+        <button class="admin-nav-link active" type="button" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </button>
+        <button class="admin-nav-link" type="button" data-tab="products">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4z"/><path d="M8 7V5h8v2"/></svg>
+          Products
+        </button>
+        <button class="admin-nav-link" type="button" data-tab="categories">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Categories
+        </button>
+        <button class="admin-nav-link" type="button" data-tab="reports">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 4-6"/></svg>
+          Reports
+        </button>
+        <button class="admin-nav-link" type="button" data-tab="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a7.7 7.7 0 0 0 .1-6l-2.1-.3-1-1.8 1.2-1.8-2.1-2.1-1.8 1.2-1.8-1-.3-2.1h-2.4l-.3 2.1-1.8 1-1.8-1.2-2.1 2.1 1.2 1.8-1 1.8-2.1.3a7.7 7.7 0 0 0 .1 6l2.1.3 1 1.8-1.2 1.8 2.1 2.1 1.8-1.2 1.8 1 .3 2.1h2.4l.3-2.1 1.8-1 1.8 1.2 2.1-2.1-1.2-1.8 1-1.8z"/></svg>
+          Settings
+        </button>
+      </nav>
+      <a class="admin-nav-link admin-nav-store" href="home.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16l-1 10H5L4 10z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Storefront
+      </a>
+    </aside>
+
+    <div class="admin-workspace">
+      <header class="admin-topbar">
+        <label class="admin-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+          <input id="admin-q" type="search" placeholder="Search products, brands, categories" autocomplete="off" />
+        </label>
+        <div class="admin-top-actions">
+          <div class="admin-user">
+            <span class="admin-avatar" id="admin-avatar">A</span>
+            <span>
+              <strong id="admin-user-name">Admin</strong>
+              <em>Catalogue manager</em>
+            </span>
+          </div>
+          <button class="admin-logout" type="button" data-logout>Log out</button>
+        </div>
+      </header>
+
+      <main class="admin-main-pane">
+        <section id="view-dashboard">
+          <div class="admin-page-head">
             <div>
-              <h2 style="margin:0">Product Catalogue Management</h2>
-              <p>Edit products inside the website — changes apply for customers immediately.</p>
+              <h1>Dashboard</h1>
+              <p>Track catalogue health, stock, and live checkout totals.</p>
             </div>
-            <button class="btn" type="button" id="add-product">Add Product</button>
           </div>
-          <div class="toolbar">
-            <input id="admin-q" placeholder="Search product name, brand or category." />
-            <select id="admin-cat"><option value="">Filter Category</option></select>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="table" id="catalogue"></table>
+          <div class="admin-kpi-row" id="dash-kpis"></div>
+          <div class="admin-split">
+            <section class="admin-card">
+              <div class="admin-card-head">
+                <h2>Needs attention</h2>
+              </div>
+              <div id="dash-alerts"></div>
+            </section>
+            <section class="admin-card">
+              <div class="admin-card-head">
+                <h2>Recent orders</h2>
+              </div>
+              <div id="dash-orders"></div>
+            </section>
           </div>
         </section>
 
-        <section class="panel" id="view-categories" hidden>
-          <div class="panel-head">
+        <section id="view-products" hidden>
+          <div class="admin-page-head">
             <div>
-              <h2 style="margin:0">Categories</h2>
-              <p>Add or remove store categories.</p>
+              <h1>Products</h1>
+              <p>Edit the live catalogue. Changes show for customers immediately.</p>
             </div>
-            <button class="btn" type="button" id="add-cat">Add Category</button>
+            <button class="btn" type="button" id="add-product">+ Product</button>
           </div>
-          <div class="field" style="max-width:360px;display:flex;gap:0.5rem">
-            <input id="cat-input" placeholder="e.g. Gaming" />
-            <button class="btn" type="button" id="add-cat-inline">Add</button>
+          <div class="admin-tabs" id="product-tabs"></div>
+          <div class="admin-filters">
+            <select id="admin-cat"><option value="">Category: All</option></select>
           </div>
-          <div class="pills" id="cat-list" style="margin-top:1rem"></div>
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <h2>Catalogue</h2>
+              <p class="meta" id="product-count"></p>
+            </div>
+            <div id="catalogue"></div>
+          </div>
+        </section>
+
+        <section id="view-categories" hidden>
+          <div class="admin-page-head">
+            <div>
+              <h1>Categories</h1>
+              <p>Add or remove store categories used across the catalogue.</p>
+            </div>
+            <button class="btn" type="button" id="add-cat">+ Category</button>
+          </div>
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <h2>Active categories</h2>
+            </div>
+            <div class="admin-inline-add">
+              <input id="cat-input" placeholder="e.g. Gaming" />
+              <button class="btn" type="button" id="add-cat-inline">Add</button>
+            </div>
+            <div class="admin-cat-grid" id="cat-list"></div>
+          </section>
         </section>
 
         <section id="view-reports" hidden>
+          <div class="admin-page-head">
+            <div>
+              <h1>Reports</h1>
+              <p>Live totals from completed checkouts.</p>
+            </div>
+          </div>
           <div id="admin-reports"></div>
         </section>
 
-        <section class="panel" id="view-settings" hidden>
-          <h2 style="margin-top:0">Settings</h2>
-          <p class="meta">Reset demo catalogue stored in this browser. Sales history is kept unless you clear it.</p>
-          <button class="btn btn-outline" type="button" id="reset-data">Reset demo catalogue</button>
-          <button class="btn btn-danger" type="button" id="clear-orders" style="margin-left:0.5rem">Clear sales history</button>
+        <section id="view-settings" hidden>
+          <div class="admin-page-head">
+            <div>
+              <h1>Settings</h1>
+              <p>Reset demo catalogue stored in this browser. Sales history is kept unless you clear it.</p>
+            </div>
+          </div>
+          <section class="admin-card">
+            <div class="admin-setting-row">
+              <div>
+                <h2>Demo catalogue</h2>
+                <p class="meta">Restore the original product list and categories.</p>
+              </div>
+              <button class="btn btn-outline" type="button" id="reset-data">Reset catalogue</button>
+            </div>
+            <div class="admin-setting-row">
+              <div>
+                <h2>Sales history</h2>
+                <p class="meta">Remove recorded orders and revenue charts.</p>
+              </div>
+              <button class="btn btn-danger" type="button" id="clear-orders">Clear sales history</button>
+            </div>
+          </section>
         </section>
       </main>
     </div>

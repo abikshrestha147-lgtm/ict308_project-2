@@ -756,7 +756,7 @@
 
     // Registered customers only
     const customer = getCustomers().find((c) => c.username === key);
-    if (!customer || customer.password !== pass) return null;
+    if (!customer || customer.password !== pass || customer.disabled) return null;
     localStorage.setItem(AUTH_KEY, "1");
     setRole("customer");
     localStorage.setItem(
@@ -889,8 +889,12 @@
 
     host.innerHTML = `
       <div class="header-top">
-        <a class="brand" href="home.html">
-          <img class="brand-logo" src="images/warner-logo.png" alt="Warner Electronics" />
+        <a class="brand" href="home.html" aria-label="Warner Electronics">
+          <img class="brand-logo" src="images/warner-mark.png" alt="" />
+          <span class="brand-text">
+            <span class="brand-name">WARNER</span>
+            <span class="brand-sub">ELECTRONICS</span>
+          </span>
         </a>
         <form class="header-search" action="search.html" method="get" role="search">
           <label class="header-search-field">
@@ -930,8 +934,31 @@
     });
 
     host.querySelector("[data-logout]")?.addEventListener("click", logout);
+    bindHeaderScroll(host);
     renderFooter();
     renderStaffBanner();
+  }
+
+  function bindHeaderScroll(header) {
+    if (!header || header.dataset.scrollBound === "1") return;
+    header.dataset.scrollBound = "1";
+    let lastY = window.scrollY || 0;
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const y = window.scrollY || 0;
+        const delta = y - lastY;
+        lastY = y;
+        if (y < 80 || header.contains(document.activeElement)) {
+          header.classList.remove("is-away");
+          return;
+        }
+        if (delta > 8) header.classList.add("is-away");
+        else if (delta < -8) header.classList.remove("is-away");
+      },
+      { passive: true }
+    );
   }
 
   function renderStaffBanner() {
@@ -1050,10 +1077,18 @@
         <p class="footer-copy">&copy; ${new Date().getFullYear()} Warner Electronics. All rights reserved.</p>
         <div class="footer-region">🇦🇺 Australia · English</div>
         <div class="footer-social" aria-label="Social links">
-          <a href="support.html" aria-label="Facebook">f</a>
-          <a href="support.html" aria-label="Instagram">ig</a>
-          <a href="support.html" aria-label="X">x</a>
-          <a href="support.html" aria-label="YouTube">yt</a>
+          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <img src="images/social-facebook.png" alt="" />
+          </a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <img src="images/social-instagram.png" alt="" />
+          </a>
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X">
+            <img src="images/social-x.png" alt="" />
+          </a>
+          <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+            <img src="images/social-youtube.png" alt="" />
+          </a>
         </div>
       </div>`;
 
@@ -1205,6 +1240,7 @@
     getSessionUser,
     registerCustomer,
     getCustomers,
+    saveCustomers,
     getCart,
     saveCart,
     addToCart,

@@ -1,10 +1,16 @@
 /* Kushal — admin dashboard */
 (function () {
   Warners.requireRole(["admin"]);
-  Warners.renderHeader("products");
+
+  const session = Warners.getSessionUser();
+  const userLabel = session?.label || session?.name || session?.username || "Admin";
+  document.getElementById("admin-user-name").textContent = userLabel;
+  document.getElementById("admin-avatar").textContent = String(userLabel).charAt(0).toUpperCase();
+  document.querySelector("[data-logout]")?.addEventListener("click", () => Warners.logout());
 
   const modal = document.getElementById("product-modal");
   let galleryDraft = [];
+  let stockFilter = "all";
   const MAX_GALLERY = 12;
   const MAX_PHOTO_BYTES = 900000;
 
@@ -29,7 +35,7 @@
     const catSelect = document.getElementById("admin-cat");
     const editCat = document.getElementById("edit-category");
     const current = catSelect.value;
-    catSelect.innerHTML = `<option value="">Filter Category</option>`;
+    catSelect.innerHTML = `<option value="">Category: All</option>`;
     editCat.innerHTML = "";
     Warners.getCategories().forEach((c) => {
       catSelect.appendChild(new Option(c, c));
@@ -186,73 +192,156 @@
     renderGalleryPreview();
   });
 
-  function renderTable() {
+  function stockStatus(p) {
+    if (Number(p.stock) <= 0) return { key: "out", label: "Out of stock" };
+    if (Number(p.stock) < 10) return { key: "low", label: "Low stock" };
+    return { key: "ok", label: "In stock" };
+  }
+
+  function filteredProducts() {
     const q = document.getElementById("admin-q").value.trim().toLowerCase();
     const cat = document.getElementById("admin-cat").value;
-    const list = Warners.getProducts().filter((p) => {
+    return Warners.getProducts().filter((p) => {
       const matchQ =
         !q ||
         p.name.toLowerCase().includes(q) ||
         (p.brand || "").toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q);
-      return matchQ && (!cat || p.category === cat);
+      const status = stockStatus(p).key;
+      const matchStock =
+        stockFilter === "all" ||
+        (stockFilter === "ok" && status === "ok") ||
+        (stockFilter === "low" && status === "low") ||
+        (stockFilter === "out" && status === "out");
+      return matchQ && matchStock && (!cat || p.category === cat);
     });
-    document.getElementById("catalogue").innerHTML = `
-      <thead>
-        <tr>
-          <th>Product</th><th>Category</th><th>Price</th><th>Stock</th>
-          <th>Weight</th><th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${list
+  }
+
+  function renderProductTabs() {
+    const all = Warners.getProducts();
+    const counts = {
+      all: all.length,
+      ok: all.filter((p) => stockStatus(p).key === "ok").length,
+      low: all.filter((p) => stockStatus(p).key === "low").length,
+      out: all.filter((p) => stockStatus(p).key === "out").length,
+    };
+    document.getElementById("product-tabs").innerHTML = [
+      ["all", `All ${counts.all}`],
+      ["ok", `In stock ${counts.ok}`],
+      ["low", `Low ${counts.low}`],
+      ["out", `Out ${counts.out}`],
+    ]
+      .map(
+        ([key, label]) =>
+          `<button class="admin-tab${stockFilter === key ? " active" : ""}" type="button" data-stock="${key}">${label}</button>`
+      )
+      .join("");
+  }
+
+  function renderDashboard() {
+    const products = Warners.getProducts();
+    const s = Warners.getReportSummary();
+    const low = products.filter((p) => stockStatus(p).key !== "ok");
+    document.getElementById("dash-kpis").innerHTML = `
+      <article class="admin-kpi"><span>Products</span><strong>${products.length}</strong><em>${Warners.getCategories().length} categories</em></article>
+      <article class="admin-kpi"><span>Orders</span><strong>${s.orderCount.toLocaleString()}</strong><em>${s.weekOrders} this week</em></article>
+      <article class="admin-kpi"><span>Revenue</span><strong>${Warners.money(s.totalRevenue)}</strong><em>${Warners.money(s.weekRevenue)} this week</em></article>
+      <article class="admin-kpi"><span>Low stock</span><strong>${low.length}</strong><em>needs a catalogue check</em></article>`;
+    document.getElementById("dash-alerts").innerHTML = low.length
+      ? low
+          .slice(0, 8)
           .map(
             (p) => `
-          <tr>
-            <td><div class="prod-cell">${
-              p.image
-                ? `<span class="prod-photo-frame"><img src="${p.image}" alt="" /></span>`
-                : `<span class="prod-ico">${p.emoji || "📦"}</span>`
-            }${p.name}<div class="meta">${p.brand || ""}</div></div></td>
-            <td>${p.category}</td>
-            <td>${Warners.money(p.price)}</td>
-            <td>${p.stock}</td>
-            <td>${p.weight}</td>
-            <td>
+        <div class="admin-alert">
+          <div><strong>${p.name}</strong><span>${p.category} · ${stockStatus(p).label}</span></div>
+          <strong>${p.stock}</strong>
+        </div>`
+          )
+          .join("")
+      : `<p class="admin-empty">All products are in healthy stock.</p>`;
+    document.getElementById("dash-orders").innerHTML = s.recent.length
+      ? s.recent
+          .slice(0, 6)
+          .map(
+            (o) => `
+        <div class="admin-order">
+          <div><strong>${o.id}</strong><span>${new Date(o.placedAt).toLocaleString()}</span></div>
+          <strong>${Warners.money(o.total)}</strong>
+        </div>`
+          )
+          .join("")
+      : `<p class="admin-empty">No checkouts yet.</p>`;
+  }
+
+  function renderTable() {
+    renderProductTabs();
+    const list = filteredProducts();
+    document.getElementById("product-count").textContent = `${list.length} shown`;
+    document.getElementById("catalogue").innerHTML = list.length
+      ? list
+          .map((p) => {
+            const status = stockStatus(p);
+            return `
+          <article class="admin-product">
+            <div class="admin-prod-main">
+              ${
+                p.image
+                  ? `<span class="prod-photo-frame"><img src="${p.image}" alt="" /></span>`
+                  : `<span class="prod-ico">${p.emoji || "📦"}</span>`
+              }
+              <div class="admin-prod-copy">
+                <strong>${p.name}</strong>
+                <span>${p.brand || "Warner"} · ${p.category}</span>
+              </div>
+            </div>
+            <span class="admin-status ${status.key}"><i></i>${status.label}</span>
+            <div class="admin-metric"><span>Price</span><strong>${Warners.money(p.price)}</strong></div>
+            <div class="admin-metric"><span>Stock</span><strong>${p.stock}</strong></div>
+            <div class="admin-prod-actions">
               <button class="btn btn-outline btn-sm" type="button" data-edit="${p.id}">Edit</button>
               <button class="btn btn-danger btn-sm" type="button" data-del="${p.id}">Del</button>
-            </td>
-          </tr>`
-          )
-          .join("")}
-      </tbody>`;
+            </div>
+          </article>`;
+          })
+          .join("")
+      : `<p class="admin-empty">No products match this filter.</p>`;
   }
 
   function renderCategories() {
     document.getElementById("cat-list").innerHTML = Warners.getCategories()
       .map(
         (c) =>
-          `<button class="pill active" type="button" data-del-cat="${c}" title="Click to remove">${c} ×</button>`
+          `<button class="admin-cat-chip" type="button" data-del-cat="${c}" title="Click to remove">${c} ×</button>`
       )
       .join("");
   }
 
   function showTab(name) {
-    ["products", "categories", "reports", "settings"].forEach((t) => {
+    ["dashboard", "products", "categories", "reports", "settings"].forEach((t) => {
       document.getElementById(`view-${t}`).hidden = t !== name;
     });
-    document.querySelectorAll(".side-link[data-tab]").forEach((btn) => {
+    document.querySelectorAll(".admin-nav-link[data-tab]").forEach((btn) => {
       btn.classList.toggle("active", btn.getAttribute("data-tab") === name);
     });
-    Warners.renderHeader(name === "reports" ? "reports" : "products");
+    if (name === "dashboard") renderDashboard();
     if (name === "reports") WarnersReports.renderSalesReports(document.getElementById("admin-reports"));
+    if (name === "products") renderTable();
   }
 
-  document.querySelectorAll(".side-link[data-tab]").forEach((btn) => {
+  document.querySelectorAll(".admin-nav-link[data-tab]").forEach((btn) => {
     btn.addEventListener("click", () => showTab(btn.getAttribute("data-tab")));
   });
-  document.getElementById("admin-q").addEventListener("input", renderTable);
+  document.getElementById("admin-q").addEventListener("input", () => {
+    if (document.getElementById("admin-q").value.trim()) showTab("products");
+    else if (!document.getElementById("view-products").hidden) renderTable();
+  });
   document.getElementById("admin-cat").addEventListener("change", renderTable);
+  document.getElementById("product-tabs").addEventListener("click", (e) => {
+    const key = e.target.getAttribute("data-stock");
+    if (!key) return;
+    stockFilter = key;
+    renderTable();
+  });
 
   document.getElementById("add-product").onclick = () => openProductModal(null);
   document.getElementById("modal-cancel").onclick = closeModal;
@@ -284,6 +373,7 @@
     closeModal();
     fillCatFilter();
     renderTable();
+    renderDashboard();
   };
 
   document.getElementById("catalogue").addEventListener("click", (e) => {
@@ -338,13 +428,17 @@
   fillCatFilter();
   renderTable();
   renderCategories();
+  renderDashboard();
   window.addEventListener("storage", (e) => {
-    if (e.key === "warners_orders" && !document.getElementById("view-reports").hidden) {
-      WarnersReports.renderSalesReports(document.getElementById("admin-reports"));
+    if (e.key === "warners_orders") {
+      renderDashboard();
+      if (!document.getElementById("view-reports").hidden) {
+        WarnersReports.renderSalesReports(document.getElementById("admin-reports"));
+      }
     }
   });
   const hash = location.hash.replace("#", "");
-  if (["products", "categories", "reports", "settings"].includes(hash)) {
+  if (["dashboard", "products", "categories", "reports", "settings"].includes(hash)) {
     showTab(hash);
   }
 })();
