@@ -1,6 +1,5 @@
 # Warner's Electronics — ICT308 Project 2
-
-Static HTML/CSS/JS frontend matched to the Figma screens.
+front end for warner's electronics
 
 ## Run in VS Code
 1. Open this folder in VS Code
@@ -12,6 +11,7 @@ Static HTML/CSS/JS frontend matched to the Figma screens.
 | customer | customer | Customer shop |
 | admin | admin | Admin catalogue |
 | owner | owner | Owner reports |
+or continue as guest
 
 ## Figma screens covered
 - Login
