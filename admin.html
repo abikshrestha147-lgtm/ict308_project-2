@@ -8,6 +8,7 @@
     <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/kushal.css" />
+    <link rel="stylesheet" href="css/theme-dark.css" />
   </head>
   <body class="admin-app">
     <aside class="admin-rail">
@@ -145,10 +146,19 @@
           <div class="admin-page-head">
             <div>
               <h1>Settings</h1>
-              <p>Reset demo catalogue stored in this browser. Sales history is kept unless you clear it.</p>
+              <p>Account preferences for this admin login, plus demo data tools.</p>
             </div>
           </div>
           <section class="admin-card">
+            <div class="admin-setting-row admin-setting-row--stack">
+              <div>
+                <h2>Appearance</h2>
+                <p class="meta">Choose Light, Dark, or System. This follows your admin account on this browser.</p>
+              </div>
+              <div class="appearance-picker" id="admin-appearance"></div>
+            </div>
+          </section>
+          <section class="admin-card" style="margin-top:1rem">
             <div class="admin-setting-row">
               <div>
                 <h2>Demo catalogue</h2>

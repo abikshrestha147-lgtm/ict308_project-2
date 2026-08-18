@@ -197,9 +197,15 @@
     }
   }
 
+  function searchHistoryKey() {
+    const session = getSessionUser();
+    if (session?.username) return `${SEARCH_HISTORY_KEY}_${session.username}`;
+    return SEARCH_HISTORY_KEY;
+  }
+
   function getSearchHistory() {
     try {
-      return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
+      return JSON.parse(localStorage.getItem(searchHistoryKey()) || "[]");
     } catch {
       return [];
     }
@@ -210,55 +216,101 @@
     if (!q || q.length < 2) return;
     const list = getSearchHistory().filter((item) => item.toLowerCase() !== q.toLowerCase());
     list.unshift(q);
-    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list.slice(0, MAX_SEARCH_HISTORY)));
+    localStorage.setItem(searchHistoryKey(), JSON.stringify(list.slice(0, MAX_SEARCH_HISTORY)));
   }
 
   function removeSearchHistoryItem(query) {
     const key = String(query || "").trim().toLowerCase();
     const list = getSearchHistory().filter((item) => item.toLowerCase() !== key);
-    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
+    localStorage.setItem(searchHistoryKey(), JSON.stringify(list));
   }
 
   function clearSearchHistory() {
-    localStorage.removeItem(SEARCH_HISTORY_KEY);
+    localStorage.removeItem(searchHistoryKey());
   }
 
-  function bindSearchHistory(input, panel, { onSearch }) {
+  function bindSearchHistory(input, panel, { onSearch, onQueryChange, liveProducts = true } = {}) {
     if (!input || !panel) return { hide: () => {} };
 
     function hideSuggestions() {
       panel.hidden = true;
     }
 
-    function renderSuggestions() {
-      const q = input.value.trim().toLowerCase();
-      const history = getSearchHistory();
-      const matches = q
-        ? history.filter((item) => item.toLowerCase().includes(q))
-        : history;
+    function notifyQueryChange() {
+      const q = input.value.trim();
+      const products =
+        q && liveProducts ? filterProducts({ q }).slice(0, 8) : [];
+      onQueryChange?.(q, products);
+    }
 
-      if (!matches.length) {
+    function renderSuggestions() {
+      const q = input.value.trim();
+      const qLower = q.toLowerCase();
+      const history = getSearchHistory();
+      const recentSearches = history.slice(0, MAX_SEARCH_HISTORY);
+      const products =
+        qLower.length >= 1 && liveProducts
+          ? filterProducts({ q: qLower }).slice(0, 6)
+          : [];
+
+      notifyQueryChange();
+
+      if (!recentSearches.length && !products.length) {
         hideSuggestions();
         panel.innerHTML = "";
         return;
       }
 
-      panel._suggestItems = matches;
-      panel.innerHTML = `
-        <div class="search-suggest-head">Recent searches</div>
-        ${matches
-          .map(
-            (item, i) => `
-          <div class="search-suggest-item" role="option">
-            <button type="button" class="search-suggest-pick" data-idx="${i}">
-              <span class="search-suggest-ico" aria-hidden="true">↺</span>
-              <span class="search-suggest-text">${escHtml(item)}</span>
-            </button>
-            <button type="button" class="search-suggest-remove" data-idx="${i}" aria-label="Remove from history">×</button>
-          </div>`
-          )
-          .join("")}
-        <button type="button" class="search-suggest-clear">Clear recent searches</button>`;
+      panel._suggestItems = recentSearches;
+      let html = `<div class="search-suggest-panel">`;
+
+      if (recentSearches.length) {
+        html += `
+        <section class="search-suggest-section">
+          <div class="search-suggest-head">Recent searches</div>
+          ${recentSearches
+            .map(
+              (item, i) => `
+            <div class="search-suggest-item" role="option">
+              <button type="button" class="search-suggest-pick" data-idx="${i}">
+                <span class="search-suggest-ico" aria-hidden="true">↺</span>
+                <span class="search-suggest-text">${escHtml(item)}</span>
+              </button>
+              <button type="button" class="search-suggest-remove" data-idx="${i}" aria-label="Remove from history">×</button>
+            </div>`
+            )
+            .join("")}
+        </section>`;
+      }
+
+      if (products.length) {
+        html += `
+        <section class="search-suggest-section search-suggest-section--products">
+          <div class="search-suggest-head">Products</div>
+          ${products
+            .map(
+              (p) => `
+            <div class="search-suggest-item search-suggest-item--product" role="option">
+              <a class="search-suggest-pick search-suggest-product" href="product.html?id=${encodeURIComponent(p.id)}">
+                <span class="search-suggest-ico" aria-hidden="true">⌕</span>
+                <span class="search-suggest-text">${escHtml(p.name)}</span>
+              </a>
+            </div>`
+            )
+            .join("")}
+        </section>`;
+      }
+
+      html += `<div class="search-suggest-foot">`;
+      if (q && products.length) {
+        html += `<button type="button" class="search-suggest-view-all">View all results for “${escHtml(q)}”</button>`;
+      }
+      if (recentSearches.length) {
+        html += `<button type="button" class="search-suggest-clear">Clear recent searches</button>`;
+      }
+      html += `</div></div>`;
+
+      panel.innerHTML = html;
       panel.hidden = false;
     }
 
@@ -269,7 +321,11 @@
     });
 
     panel.addEventListener("mousedown", (e) => {
-      if (e.target.closest(".search-suggest-remove, .search-suggest-pick, .search-suggest-clear")) {
+      if (
+        e.target.closest(
+          ".search-suggest-remove, .search-suggest-pick, .search-suggest-clear, .search-suggest-view-all"
+        )
+      ) {
         e.preventDefault();
       }
     });
@@ -286,10 +342,18 @@
         clearSearchHistory();
         hideSuggestions();
         panel.innerHTML = "";
+        notifyQueryChange();
+        return;
+      }
+      if (e.target.closest(".search-suggest-view-all")) {
+        const query = input.value.trim();
+        if (query) recordSearch(query);
+        hideSuggestions();
+        onSearch?.();
         return;
       }
       const pick = e.target.closest(".search-suggest-pick");
-      if (pick) {
+      if (pick && pick.tagName === "BUTTON") {
         const item = panel._suggestItems?.[Number(pick.getAttribute("data-idx"))];
         if (!item) return;
         input.value = item;
@@ -299,7 +363,7 @@
       }
     });
 
-    return { hide: hideSuggestions };
+    return { hide: hideSuggestions, refresh: renderSuggestions };
   }
 
   function escHtml(value) {
@@ -308,6 +372,23 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function getFirstName(session) {
+    if (!session) return "";
+    const customer =
+      session.username && getRole() === "customer"
+        ? getCustomers().find((c) => c.username === session.username)
+        : null;
+    const source =
+      customer?.firstName ||
+      session.name ||
+      session.label ||
+      session.username ||
+      "";
+    const first = String(source).trim().split(/\s+/)[0];
+    if (!first) return "there";
+    return first.charAt(0).toUpperCase() + first.slice(1);
   }
 
   function getPurchasedIds() {
@@ -464,6 +545,274 @@
     }
     if (!options?.silent) toast("Profile updated");
     return { ok: true, profile: getCustomerProfile() };
+  }
+
+  function defaultCustomerSettings() {
+    return {
+      notifications: { orders: true, deals: true, recommendations: true },
+      communications: { email: true, sms: false, marketing: false },
+      privacy: { personalization: true, analytics: true },
+      appearance: "system",
+    };
+  }
+
+  function getCustomerSettings() {
+    const username = getCurrentCustomerUsername();
+    if (!username) return defaultCustomerSettings();
+    const customer = getCustomers().find((c) => c.username === username);
+    const saved = customer?.settings || {};
+    return {
+      ...defaultCustomerSettings(),
+      ...saved,
+      notifications: { ...defaultCustomerSettings().notifications, ...(saved.notifications || {}) },
+      communications: { ...defaultCustomerSettings().communications, ...(saved.communications || {}) },
+      privacy: { ...defaultCustomerSettings().privacy, ...(saved.privacy || {}) },
+    };
+  }
+
+  function saveCustomerSettings(partial, options) {
+    const username = getCurrentCustomerUsername();
+    if (!username) return { ok: false, error: "You must be logged in as a customer." };
+    const list = getCustomers();
+    const index = list.findIndex((c) => c.username === username);
+    if (index < 0) return { ok: false, error: "Account not found." };
+    const customer = list[index];
+    const current = getCustomerSettings();
+    const next = {
+      ...current,
+      ...partial,
+      notifications: { ...current.notifications, ...(partial.notifications || {}) },
+      communications: { ...current.communications, ...(partial.communications || {}) },
+      privacy: { ...current.privacy, ...(partial.privacy || {}) },
+    };
+    customer.settings = next;
+    saveCustomers(list);
+    applyAppearance();
+    if (!options?.silent) toast("Settings saved");
+    return { ok: true, settings: next };
+  }
+
+  function appearanceStorageKey() {
+    const session = getSessionUser();
+    const user = session?.username || getRole() || "guest";
+    return `warners_appearance_${user}`;
+  }
+
+  function getAppearance() {
+    if (getRole() === "customer") {
+      return getCustomerSettings().appearance || "system";
+    }
+    try {
+      const saved = localStorage.getItem(appearanceStorageKey());
+      if (saved) return saved;
+      return isLoggedIn() ? "system" : "light";
+    } catch {
+      return isLoggedIn() ? "system" : "light";
+    }
+  }
+
+  function setAppearance(mode, options) {
+    const value = ["light", "dark", "system"].includes(mode) ? mode : "system";
+    if (getRole() === "customer") {
+      return saveCustomerSettings({ appearance: value }, { silent: options?.silent });
+    }
+    localStorage.setItem(appearanceStorageKey(), value);
+    applyAppearance();
+    if (!options?.silent) toast("Appearance updated");
+    return { ok: true, appearance: value };
+  }
+
+  function defaultGuestPrefs() {
+    return { privacy: { personalization: true, analytics: true } };
+  }
+
+  function getGuestPrefs() {
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem("warners_guest_prefs") || "{}");
+    } catch {
+      saved = {};
+    }
+    return {
+      ...defaultGuestPrefs(),
+      ...saved,
+      privacy: { ...defaultGuestPrefs().privacy, ...(saved.privacy || {}) },
+    };
+  }
+
+  function saveGuestPrefs(partial, options) {
+    const current = getGuestPrefs();
+    const next = {
+      ...current,
+      ...partial,
+      privacy: { ...current.privacy, ...(partial.privacy || {}) },
+    };
+    localStorage.setItem("warners_guest_prefs", JSON.stringify(next));
+    if (!options?.silent) toast("Settings saved");
+    return { ok: true, settings: next };
+  }
+
+  function appearanceLabel(mode) {
+    if (mode === "dark") return "Dark";
+    if (mode === "light") return "Light";
+    return "System";
+  }
+
+  function bindAppearancePicker(host) {
+    if (!host) return;
+    const current = getAppearance();
+    host.innerHTML = ["light", "dark", "system"]
+      .map(
+        (mode) => `
+        <label class="appearance-choice ${current === mode ? "is-selected" : ""}">
+          <input type="radio" name="appearance" value="${mode}" ${current === mode ? "checked" : ""} />
+          <span>
+            <strong>${appearanceLabel(mode)}</strong>
+            <em>${
+              mode === "light"
+                ? "Bright backgrounds and dark text"
+                : mode === "dark"
+                  ? "Dark backgrounds and light text"
+                  : "Match this device’s light or dark setting"
+            }</em>
+          </span>
+        </label>`
+      )
+      .join("");
+    host.querySelectorAll('input[name="appearance"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        setAppearance(input.value, { silent: true });
+        host.querySelectorAll(".appearance-choice").forEach((row) => {
+          row.classList.toggle("is-selected", row.querySelector("input")?.checked);
+        });
+      });
+    });
+  }
+
+  function applyAppearance() {
+    let mode = getAppearance() || "system";
+    if (mode === "system") {
+      mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", mode);
+  }
+
+  function applyCustomerAppearance() {
+    applyAppearance();
+  }
+
+  function staffStorageUser() {
+    const session = getSessionUser();
+    return session?.username || getRole() || "staff";
+  }
+
+  function defaultStaffPrefs() {
+    return { notifications: { orders: true, stock: true, customers: true } };
+  }
+
+  function getStaffProfile() {
+    const session = getSessionUser();
+    const role = getRole();
+    const username = staffStorageUser();
+    const staff = window.WARNERS_USERS?.[username] || {};
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem(`warners_staff_profile_${username}`) || "{}");
+    } catch {
+      saved = {};
+    }
+    const name = saved.name || session?.name || staff.label || username;
+    return {
+      username,
+      role,
+      name,
+      email: saved.email || `${username}@warnerelectronics.com`,
+      phone: saved.phone || "",
+      label: role === "owner" ? "Store owner" : "Catalogue manager",
+    };
+  }
+
+  function saveStaffProfile(data, options) {
+    const username = staffStorageUser();
+    if (!username || (getRole() !== "admin" && getRole() !== "owner")) {
+      return { ok: false, error: "Staff login required." };
+    }
+    const current = getStaffProfile();
+    const next = {
+      name: String(data.name ?? current.name).trim() || current.name,
+      email: String(data.email ?? current.email).trim(),
+      phone: String(data.phone ?? current.phone).trim(),
+    };
+    localStorage.setItem(`warners_staff_profile_${username}`, JSON.stringify(next));
+    const session = getSessionUser();
+    if (session) {
+      session.name = next.name;
+      session.label = next.name;
+      localStorage.setItem(USER_KEY, JSON.stringify(session));
+    }
+    if (!options?.silent) toast("Profile updated");
+    return { ok: true, profile: getStaffProfile() };
+  }
+
+  function getStaffPrefs() {
+    const username = staffStorageUser();
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem(`warners_staff_prefs_${username}`) || "{}");
+    } catch {
+      saved = {};
+    }
+    return {
+      ...defaultStaffPrefs(),
+      ...saved,
+      notifications: { ...defaultStaffPrefs().notifications, ...(saved.notifications || {}) },
+    };
+  }
+
+  function saveStaffPrefs(partial, options) {
+    const username = staffStorageUser();
+    const current = getStaffPrefs();
+    const next = {
+      ...current,
+      ...partial,
+      notifications: { ...current.notifications, ...(partial.notifications || {}) },
+    };
+    localStorage.setItem(`warners_staff_prefs_${username}`, JSON.stringify(next));
+    if (!options?.silent) toast("Settings saved");
+    return { ok: true, settings: next };
+  }
+
+  function getStaffPassword(username) {
+    const key = String(username || "").trim().toLowerCase();
+    return localStorage.getItem(`warners_staff_pass_${key}`) || window.WARNERS_USERS?.[key]?.password || "";
+  }
+
+  function updateStaffPassword(currentPassword, newPassword) {
+    const username = staffStorageUser();
+    const pass = String(newPassword || "");
+    if (pass.length < 4) return { ok: false, error: "Password must be at least 4 characters." };
+    if (getStaffPassword(username) !== String(currentPassword || "")) {
+      return { ok: false, error: "Current password is incorrect." };
+    }
+    localStorage.setItem(`warners_staff_pass_${username}`, pass);
+    toast("Password updated");
+    return { ok: true };
+  }
+
+  function updateCustomerPassword(currentPassword, newPassword) {
+    const username = getCurrentCustomerUsername();
+    if (!username) return { ok: false, error: "You must be logged in." };
+    const pass = String(newPassword || "");
+    if (pass.length < 4) return { ok: false, error: "Password must be at least 4 characters." };
+    const list = getCustomers();
+    const customer = list.find((c) => c.username === username);
+    if (!customer || customer.password !== String(currentPassword || "")) {
+      return { ok: false, error: "Current password is incorrect." };
+    }
+    customer.password = pass;
+    saveCustomers(list);
+    toast("Password updated");
+    return { ok: true };
   }
 
   function getOrderTracking(order) {
@@ -738,17 +1087,24 @@
     // Staff demo accounts only (admin / owner) — no demo customer
     const staff = window.WARNERS_USERS[key];
     if (staff) {
-      if (staff.password !== pass) return null;
+      if (getStaffPassword(key) !== pass) return null;
+      let profileName = staff.label;
+      try {
+        const saved = JSON.parse(localStorage.getItem(`warners_staff_profile_${key}`) || "{}");
+        if (saved.name) profileName = saved.name;
+      } catch {
+        /* keep demo label */
+      }
       localStorage.setItem(AUTH_KEY, "1");
       setRole(staff.role);
       localStorage.setItem(
         USER_KEY,
         JSON.stringify({
           username: key,
-          name: staff.label,
+          name: profileName,
           role: staff.role,
-          initial: staff.initial,
-          label: staff.label,
+          initial: (profileName || staff.initial || "S").charAt(0).toUpperCase(),
+          label: profileName,
         })
       );
       return staff;
@@ -819,6 +1175,7 @@
 
   function renderHeader(active) {
     const role = getRole();
+    const session = getSessionUser();
     const host = document.querySelector("[data-header]");
     if (!host) return;
 
@@ -861,14 +1218,28 @@
           </a>
           <div class="header-account-menu">
             <a href="${profileHref}">${profileLabel}</a>
+            <a href="${
+              role === "admin"
+                ? "admin.html#settings"
+                : role === "owner"
+                  ? "owner.html#settings"
+                  : "settings.html"
+            }">Settings</a>
             <button type="button" data-logout>Log out</button>
           </div>
         </div>`;
     } else {
       account = `
-        <a class="header-icon-link${active === "login" ? " is-active" : ""}" href="login.html" title="Log in" aria-label="Log in">
-          <span class="header-icon">${personSvg}</span>
-        </a>`;
+        <div class="header-account">
+          <a class="header-icon-link${active === "login" || active === "settings" ? " is-active" : ""}" href="login.html" title="Account" aria-label="Account">
+            <span class="header-icon">${personSvg}</span>
+          </a>
+          <div class="header-account-menu">
+            <a href="login.html">Log in</a>
+            <a href="login.html?signup=1">Create account</a>
+            <a href="settings.html">Settings</a>
+          </div>
+        </div>`;
     }
 
     const catLinks = getCategories()
@@ -885,6 +1256,12 @@
       extraNav = `<a href="admin.html" class="${dashOn ? "active" : ""}">Dashboard</a>`;
     } else if (role === "owner") {
       extraNav = `<a href="owner.html" class="${dashOn ? "active" : ""}">Dashboard</a>`;
+    }
+
+    let greeting = "";
+    if (role === "admin" || role === "owner" || role === "customer") {
+      const firstName = getFirstName(session);
+      greeting = `<p class="header-greeting">Hello, <strong>${escHtml(firstName)}</strong></p>`;
     }
 
     host.innerHTML = `
@@ -908,7 +1285,7 @@
           </label>
           <div class="search-suggest" hidden role="listbox" aria-label="Recent searches"></div>
         </form>
-        <div class="header-utils">${account}${cartIcon}</div>
+        <div class="header-utils">${greeting}${account}${cartIcon}</div>
       </div>
       <nav class="header-nav">
         <a href="home.html" class="${active === "home" ? "active" : ""}">Home</a>
@@ -979,17 +1356,19 @@
     const role = getRole();
     const accountLink =
       role === "customer"
-        ? `<li><a href="account.html">My account</a></li>`
-        : `<li><a href="login.html">Log in</a></li>`;
+        ? `<li><a href="account.html">My account</a></li><li><a href="settings.html">Settings</a></li>`
+        : role === "admin" || role === "owner"
+          ? ""
+          : `<li><a href="login.html">Log in</a></li><li><a href="settings.html">Settings</a></li>`;
     const trackLink =
       role === "customer"
         ? `<li><a href="account.html#tracking">Track my order</a></li>`
         : `<li><a href="login.html">Track my order</a></li>`;
     const dashLink =
       role === "admin"
-        ? `<li><a href="admin.html">Dashboard</a></li>`
+        ? `<li><a href="admin.html">Dashboard</a></li><li><a href="admin.html#settings">Settings</a></li>`
         : role === "owner"
-          ? `<li><a href="owner.html">Dashboard</a></li>`
+          ? `<li><a href="owner.html">Dashboard</a></li><li><a href="owner.html#settings">Settings</a></li>`
           : "";
 
     const html = `
@@ -1230,6 +1609,67 @@
     });
   }
 
+  function bindPageMotion() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    document.body.classList.add("page-enter");
+
+    function isInternalNavLink(anchor) {
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return false;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+        return false;
+      }
+      try {
+        const url = new URL(href, location.href);
+        if (url.origin !== location.origin) return false;
+        if (
+          url.pathname === location.pathname &&
+          url.search === location.search &&
+          url.hash &&
+          !url.pathname.endsWith(".html")
+        ) {
+          return false;
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const link = e.target.closest("a[href]");
+        if (!isInternalNavLink(link)) return;
+        const href = link.getAttribute("href");
+        e.preventDefault();
+        document.body.classList.remove("page-enter");
+        document.body.classList.add("page-exit");
+        window.setTimeout(() => {
+          location.href = href;
+        }, 420);
+      },
+      true
+    );
+  }
+
+  function animateView(el) {
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    el.classList.remove("view-fade-in");
+    void el.offsetWidth;
+    el.classList.add("view-fade-in");
+  }
+
+  bindPageMotion();
+  applyAppearance();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (getAppearance() === "system") {
+      applyAppearance();
+    }
+  });
+
   window.Warners = {
     getRole,
     setRole,
@@ -1286,8 +1726,24 @@
     getCustomerOrders,
     getCustomerProfile,
     updateCustomerProfile,
+    getCustomerSettings,
+    saveCustomerSettings,
+    updateCustomerPassword,
+    getGuestPrefs,
+    saveGuestPrefs,
+    getAppearance,
+    setAppearance,
+    applyAppearance,
+    applyCustomerAppearance,
+    bindAppearancePicker,
+    getStaffProfile,
+    saveStaffProfile,
+    getStaffPrefs,
+    saveStaffPrefs,
+    updateStaffPassword,
     getOrderTracking,
     getRecommendations,
     filterProducts,
+    animateView,
   };
 })();

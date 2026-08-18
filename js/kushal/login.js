@@ -2,14 +2,27 @@
 (function () {
   const loginView = document.getElementById("login-view");
   const signupView = document.getElementById("signup-view");
+  const loginTab = document.getElementById("show-login");
+  const signupTab = document.getElementById("show-signup");
 
   function showSignup() {
     loginView.hidden = true;
     signupView.hidden = false;
+    loginTab.classList.remove("active");
+    signupTab.classList.add("active");
+    loginTab.setAttribute("aria-selected", "false");
+    signupTab.setAttribute("aria-selected", "true");
+    Warners.animateView(signupView);
   }
+
   function showLogin() {
     signupView.hidden = true;
     loginView.hidden = false;
+    signupTab.classList.remove("active");
+    loginTab.classList.add("active");
+    signupTab.setAttribute("aria-selected", "false");
+    loginTab.setAttribute("aria-selected", "true");
+    Warners.animateView(loginView);
   }
 
   if (new URLSearchParams(location.search).get("signup") === "1") showSignup();
@@ -20,20 +33,21 @@
 
   Warners.renderHeader("login");
 
-  document.getElementById("show-signup").onclick = showSignup;
-  document.getElementById("show-login").onclick = showLogin;
+  signupTab.addEventListener("click", showSignup);
+  loginTab.addEventListener("click", showLogin);
 
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
+    const err = document.getElementById("error");
+    err.hidden = true;
     const user = Warners.login(
       document.getElementById("username").value,
       document.getElementById("password").value
     );
-    const err = document.getElementById("error");
     if (!user) {
-      err.style.display = "block";
+      err.hidden = false;
       err.textContent =
-        "Login failed. Create a customer account first, or use admin/owner.";
+        "We couldn't sign you in. Check your details or create an account first.";
       return;
     }
     location.href = Warners.afterLoginPath(user.role);
@@ -42,11 +56,12 @@
   document.getElementById("signup-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const err = document.getElementById("signup-error");
+    err.hidden = true;
     const password = document.getElementById("new-password").value;
     const confirm = document.getElementById("confirm-password").value;
     if (password !== confirm) {
-      err.style.display = "block";
-      err.textContent = "Passwords do not match.";
+      err.hidden = false;
+      err.textContent = "Passwords do not match. Please try again.";
       return;
     }
     const result = Warners.registerCustomer({
@@ -55,7 +70,7 @@
       password,
     });
     if (!result.ok) {
-      err.style.display = "block";
+      err.hidden = false;
       err.textContent = result.error;
       return;
     }

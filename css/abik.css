@@ -1,4 +1,10 @@
 /* Abik — extra styles for customer home + search */
+.search-layout--browse {
+  grid-template-columns: 1fr;
+}
+.filters[hidden] {
+  display: none !important;
+}
 .search-wrap {
   position: relative;
 }
@@ -8,14 +14,31 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 16px 36px rgba(0, 11, 30, 0.12);
   overflow: hidden;
-  max-height: 320px;
+  max-height: 420px;
   overflow-y: auto;
+}
+.search-suggest-panel {
+  display: flex;
+  flex-direction: column;
+}
+.search-suggest-section + .search-suggest-section {
+  border-top: 1px solid var(--line);
+}
+.search-suggest-foot {
+  border-top: 1px solid var(--line);
+}
+.search-suggest-foot .search-suggest-clear,
+.search-suggest-foot .search-suggest-view-all {
+  border-top: none;
+}
+.search-suggest-foot .search-suggest-view-all + .search-suggest-clear {
+  border-top: 1px solid var(--line);
 }
 .search-suggest[hidden] {
   display: none !important;
@@ -102,6 +125,38 @@
 .search-suggest-clear:hover {
   background: #f1f5f9;
   color: var(--navy);
+}
+.search-suggest-item--product {
+  grid-template-columns: 1fr;
+}
+.search-suggest-product .search-suggest-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+.search-suggest-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-suggest-view-all {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: #f8fafc;
+  color: var(--navy);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+.search-suggest-view-all:hover {
+  background: #eef6ff;
 }
 
 #featured,

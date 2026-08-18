@@ -326,6 +326,8 @@
     if (name === "dashboard") renderDashboard();
     if (name === "reports") WarnersReports.renderSalesReports(document.getElementById("admin-reports"));
     if (name === "products") renderTable();
+    if (name === "settings") Warners.bindAppearancePicker(document.getElementById("admin-appearance"));
+    Warners.animateView(document.getElementById(`view-${name}`));
   }
 
   document.querySelectorAll(".admin-nav-link[data-tab]").forEach((btn) => {

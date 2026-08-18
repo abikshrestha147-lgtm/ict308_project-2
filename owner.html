@@ -8,6 +8,8 @@
     <link rel="icon" href="images/warner-logo.png" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/kushal.css" />
+    <link rel="stylesheet" href="css/sukhman.css" />
+    <link rel="stylesheet" href="css/theme-dark.css" />
   </head>
   <body class="admin-app">
     <aside class="admin-rail">
@@ -37,8 +39,12 @@
           Performance
         </button>
         <button class="admin-nav-link" type="button" data-tab="store">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a7.7 7.7 0 0 0 .1-6l-2.1-.3-1-1.8 1.2-1.8-2.1-2.1-1.8 1.2-1.8-1-.3-2.1h-2.4l-.3 2.1-1.8 1-1.8-1.2-2.1 2.1 1.2 1.8-1 1.8-2.1.3a7.7 7.7 0 0 0 .1 6l2.1.3 1 1.8-1.2 1.8 2.1 2.1 1.8-1.2 1.8 1 .3 2.1h2.4l.3-2.1 1.8-1 1.8 1.2 2.1-2.1-1.2-1.8 1-1.8z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16l-1 10H5L4 10z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
           Store
+        </button>
+        <button class="admin-nav-link" type="button" data-tab="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a7.7 7.7 0 0 0 .1-6l-2.1-.3-1-1.8 1.2-1.8-2.1-2.1-1.8 1.2-1.8-1-.3-2.1h-2.4l-.3 2.1-1.8 1-1.8-1.2-2.1 2.1 1.2 1.8-1 1.8-2.1.3a7.7 7.7 0 0 0 .1 6l2.1.3 1 1.8-1.2 1.8 2.1 2.1 1.8-1.2 1.8 1 .3 2.1h2.4l.3-2.1 1.8-1 1.8 1.2 2.1-2.1-1.2-1.8 1-1.8z"/></svg>
+          Settings
         </button>
       </nav>
       <a class="admin-nav-link admin-nav-store" href="home.html">
@@ -156,6 +162,99 @@
               <button class="btn btn-danger" type="button" id="owner-clear-orders">Clear sales history</button>
             </div>
           </section>
+        </section>
+
+        <section id="view-settings" hidden>
+          <div class="staff-settings">
+            <div id="owner-settings-hub">
+              <header class="settings-page-head">
+                <h1>Settings</h1>
+              </header>
+
+              <button type="button" class="settings-profile-card" data-screen="personal">
+                <span class="settings-avatar" id="owner-set-avatar">O</span>
+                <span class="settings-profile-copy">
+                  <strong id="owner-set-name">Owner</strong>
+                  <span id="owner-set-meta">Store owner</span>
+                </span>
+                <span class="settings-chevron" aria-hidden="true">›</span>
+              </button>
+
+              <section class="settings-group">
+                <h2 class="settings-group-title">Account</h2>
+                <div class="settings-list">
+                  <button type="button" class="settings-row" data-screen="personal">
+                    <span class="settings-row-label">Personal info</span>
+                    <span class="settings-row-value" id="owner-hub-personal">Update details</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                  <button type="button" class="settings-row" data-screen="security">
+                    <span class="settings-row-label">Security</span>
+                    <span class="settings-row-value">Password</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <h2 class="settings-group-title">Workspace</h2>
+                <div class="settings-list">
+                  <button type="button" class="settings-row" data-jump="people">
+                    <span class="settings-row-label">People</span>
+                    <span class="settings-row-value">Staff and customers</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                  <button type="button" class="settings-row" data-jump="reports">
+                    <span class="settings-row-label">Analytics</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                  <button type="button" class="settings-row" data-jump="store">
+                    <span class="settings-row-label">Store</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                  <a class="settings-row" href="home.html">
+                    <span class="settings-row-label">View storefront</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </a>
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <h2 class="settings-group-title">Preferences</h2>
+                <div class="settings-list">
+                  <button type="button" class="settings-row" data-screen="notifications">
+                    <span class="settings-row-label">Notifications</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                  <button type="button" class="settings-row" data-screen="appearance">
+                    <span class="settings-row-label">Appearance</span>
+                    <span class="settings-row-value" id="owner-hub-appearance">System</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </button>
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <h2 class="settings-group-title">Support</h2>
+                <div class="settings-list">
+                  <a class="settings-row" href="support.html">
+                    <span class="settings-row-label">Help centre</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                  </a>
+                </div>
+              </section>
+
+              <button type="button" class="settings-signout btn btn-outline" data-logout>Sign out</button>
+            </div>
+
+            <div id="owner-settings-detail" hidden>
+              <header class="settings-detail-head">
+                <button type="button" class="settings-back" id="owner-settings-back">← Settings</button>
+                <h1 id="owner-settings-title">Detail</h1>
+              </header>
+              <div class="settings-detail-body" id="owner-settings-body"></div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
